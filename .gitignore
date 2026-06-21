@@ -1,4 +1,4 @@
-# secrets — never commit real tokens/keys
+# secrets - never commit real tokens/keys
 .env
 *.local
 
