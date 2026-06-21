@@ -22,3 +22,13 @@ backend/.env
 
 # logs
 *.log
+
+# OpenClaw workspace artifacts (agent runtime, not the app)
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+openclaw-workspace-state.json
+.context/
