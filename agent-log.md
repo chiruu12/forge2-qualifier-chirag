@@ -26,12 +26,20 @@ Verified during setup: `auth.test` → `{"ok":true,"user":"forgeunplug","team":"
 > Paste the Hermes session where it decomposes a goal into steps (Kimi 2.6).
 
 ## Memory recall (across two sessions)
+
+![Hermes saves a fact](docs/hermes-memory-save.png)
+
+![Hermes recalls it in a new session](docs/hermes-memory-recall.png)
 > Session A: tell Hermes a fact (repo name, branch, model routing). Session B (restart): ask it to recall. Screenshot both.
 
 ## Skill firing (status-report)
+
+![status-report skill fires](docs/hermes-skill.png)
 > Ask Hermes for a status update; it returns the three sections from `skills/status-report/SKILL.md`. Screenshot.
 
 ## Autonomous run (cron)
+
+![Hermes cron scheduled to post to #agent_log](docs/hermes-cron.png)
 > Hermes cron posts a one-line update to `#agent_log` with no human prompt. Screenshot the timestamped message.
 
 ---
