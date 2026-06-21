@@ -18,6 +18,8 @@ Record of the two-agent system being set up and driven through Slack.
 Verified during setup: `auth.test` → `{"ok":true,"user":"forgeunplug","team":"..."}`; bot posts and reads in `#sprint_main`, `#agent_coder`, `#agent_log`.
 
 ## Loop demo (human → agent in Slack)
+
+![OpenClaw coder agent: writes and runs FizzBuzz in #agent_coder](docs/slack-loop.png)
 > Paste your `#agent_coder` exchange: you posted a task, OpenClaw (gpt-5.4-nano) replied / ran it. Screenshot.
 
 ## Hermes (brain) planning
