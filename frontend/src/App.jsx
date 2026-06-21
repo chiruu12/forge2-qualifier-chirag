@@ -99,7 +99,13 @@ export default function App() {
         </div>
       )}
       <header>
-        <h1>{board.name}</h1>
+        <div className="brand">
+          <div className="logo">◆</div>
+          <div>
+            <h1>{board.name}</h1>
+            <p className="sub">Two-agent Kanban · Hermes plans · OpenClaw builds</p>
+          </div>
+        </div>
         <div className="members">
           👥 {board.members.map(m => m.name).join(', ') || 'no members'}
           <button onClick={() => { const n = prompt('Member name'); if (n) addMember(n) }}>+ member</button>
