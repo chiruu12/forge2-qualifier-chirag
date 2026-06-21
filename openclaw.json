@@ -1,0 +1,55 @@
+{
+  "_comment": "OpenClaw (hands/coder) config. Secrets removed: gateway token redacted; all API tokens are env references resolved from .env at runtime.",
+  "agents": {
+    "defaults": {
+      "workspace": "<repo-root>",
+      "model": { "primary": "openai/gpt-5.4-nano" },
+      "models": {
+        "lmstudio/liquid/lfm2.5-1.2b": {},
+        "openai/gpt-3.5-turbo": {},
+        "openai/gpt-5.4-nano": {}
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": { "mode": "token", "token": "REDACTED" },
+    "port": 18789,
+    "bind": "loopback",
+    "tailscale": { "mode": "off", "resetOnExit": false }
+  },
+  "session": { "dmScope": "per-channel-peer" },
+  "tools": { "profile": "coding" },
+  "skills": { "install": { "nodeManager": "npm" } },
+  "channels": {
+    "slack": {
+      "enabled": true,
+      "mode": "socket",
+      "appToken": { "source": "env", "provider": "default", "id": "SLACK_APP_TOKEN" },
+      "botToken": { "source": "env", "provider": "default", "id": "SLACK_BOT_TOKEN" }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "lmstudio": {
+        "baseUrl": "http://localhost:1234/v1",
+        "apiKey": "lm-studio",
+        "api": "openai-completions",
+        "contextWindow": 32768,
+        "models": [
+          { "id": "liquid/lfm2.5-1.2b", "name": "LFM2.5 1.2B", "api": "openai-completions", "input": ["text"] }
+        ]
+      },
+      "openai": {
+        "apiKey": { "source": "env", "provider": "default", "id": "OPENAI_API_KEY" }
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "slack": { "enabled": true },
+      "codex": { "enabled": false }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+# Hermes (brain/orchestrator) config - relevant excerpt of ~/.hermes/config.yaml.
+# Secret removed: api_key is the real Fireworks key locally; here it's an env placeholder.
+# Brain = Kimi 2.6 on Fireworks, reached via the OpenAI-compatible "custom" provider.
+
+model:
+  default: accounts/fireworks/models/kimi-k2p6
+  provider: custom
+  base_url: https://api.fireworks.ai/inference/v1
+  max_tokens: 8192          # Fireworks/Kimi output cap
+  context_length: 131072
+  api_key: ${FIREWORKS_API_KEY}   # REMOVED - set locally in ~/.hermes/.env
+
+toolsets:
+  - hermes-cli
+
+# Memory (cross-session), the status-report skill, and a cron autonomous run
+# are all enabled and demonstrated in agent-log.md.

@@ -45,3 +45,10 @@ flowchart LR
 - **Memory:** Hermes stores project facts (repo name, default branch, model routing) and recalls them in a later session without re-pasting.
 - **Skill:** [`skills/status-report/SKILL.md`](skills/status-report/SKILL.md) makes every status update return in the same three sections.
 - **Autonomous run:** a Hermes cron posts a one-line progress update to `#agent_log` on a schedule with no human prompt.
+
+## Config files (in this repo, secrets removed)
+
+- `openclaw.json` - OpenClaw config; gateway token redacted, Slack + OpenAI keys are env references.
+- `hermes-config.yaml` - Hermes model routing; the Fireworks `api_key` is removed.
+- `slack.socket.patch.json5`, `model.patch.json5`, `openai.patch.json5` - the exact patches applied to OpenClaw.
+- `.env.example` - every env var the setup needs (fill with your own keys; never commit the real `.env`).
