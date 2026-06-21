@@ -1,0 +1,24 @@
+# secrets — never commit real tokens/keys
+.env
+*.local
+
+# working notes (not for submission)
+RUNBOOK.md
+PROMPT_PLAYBOOK.md
+notes/
+
+# node
+node_modules/
+dist/
+
+# php / laravel
+vendor/
+backend/.env
+*.sqlite
+*.sqlite-journal
+
+# os
+.DS_Store
+
+# logs
+*.log
