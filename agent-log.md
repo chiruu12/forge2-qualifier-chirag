@@ -5,8 +5,8 @@ Record of the two-agent system being set up and driven through Slack.
 ## Summary (honest)
 
 - **Both agents are stood up, configured on free-format model endpoints, and verified live:**
-  - **OpenClaw (hands)** — gateway running, connected to Slack via Socket Mode, model `openai/gpt-5.4-nano`, answered prompts in `#agent_coder`.
-  - **Hermes (brain)** — running, model Kimi 2.6 (`accounts/fireworks/models/kimi-k2p6` on Fireworks), responds in its session and plans.
+  - **OpenClaw (hands)** - gateway running, connected to Slack via Socket Mode, model `openai/gpt-5.4-nano`, answered prompts in `#agent_coder`.
+  - **Hermes (brain)** - running, model Kimi 2.6 (`accounts/fireworks/models/kimi-k2p6` on Fireworks), responds in its session and plans.
 - The **human → agent loop runs in Slack** (round-trip + agent replies below).
 - **Build transparency:** under the qualifier time limit, the Kanban app was completed by the builder by hand (Laravel API + React UI) rather than fully typed out by the coding agent. The two-agent setup, Slack loop, memory, skill, and autonomous run are genuine and demonstrated below. Nothing here is fabricated.
 
