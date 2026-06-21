@@ -1,6 +1,6 @@
 # forge2-qualifier-chirag
 
-A tiny Trello-style Kanban board built by a two-agent system, driven entirely through Slack.
+A tiny Trello-style Kanban board built by a **two-agent system**, driven entirely through Slack.
 
 - **Brain (orchestrator):** Hermes Agent — plans, remembers, runs a skill, runs on a schedule.
 - **Hands (coder):** OpenClaw — writes and runs the code, reports back in chat.
@@ -13,45 +13,51 @@ A small Kanban board: **Boards → Lists → Cards**, with card details, coloure
 - **Backend:** Laravel (PHP 8.2+) REST API, SQLite.
 - **Frontend:** React (Vite).
 
-## Models (free stack only)
+## Models & routing
 
 | Role | Model | Endpoint | Why |
 |------|-------|----------|-----|
-| Brain / planning (Hermes) | Groq `openai/gpt-oss-120b` | `https://api.groq.com/openai/v1` | Strong, fast planner for decomposition; short bursty calls fit Groq's free tier. |
-| Hands / coding (OpenClaw) | LFM 2.5 (LM Studio) | `http://localhost:1234/v1` | A small, fast local model running fully offline — demonstrating a lightweight local executor. No paid API, no rate limits. |
+| **Brain / planning** (Hermes) | Kimi 2.6 — `accounts/fireworks/models/kimi-k2p6` (Fireworks) | `https://api.fireworks.ai/inference/v1` | Strong reasoning for decomposing goals into steps. |
+| **Hands / coding** (OpenClaw) | OpenAI `gpt-5.4-nano` | `https://api.openai.com/v1` | Cheap, fast, tool-calling executor for the actual file edits. |
 
-No paid models or subscriptions. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the routing rationale.
+**Routing rationale:** the strong model plans, the cheap model executes — the pattern the brief recommends. We began on a fully free stack (Groq + a local model) and moved the loop onto a small set of paid models to get **reliable end-to-end execution**. That trades the free-stack bonus for stability — in the spirit of the brief's own rule that *a clean, working setup beats an ambitious broken one*. See [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Live URL
 
-> _<add your deployed frontend URL here before submitting>_
+> _<add your deployed Vercel frontend URL here before submitting>_
 
 ## Run locally
 
-### Backend (Laravel API)
+### 1. Backend (Laravel API)
 ```bash
 cd backend
 composer install
 cp .env.example .env && php artisan key:generate
-php artisan migrate --seed
-php artisan serve            # http://localhost:8000
+php artisan migrate:fresh --seed     # SQLite, with demo data
+php artisan serve                    # http://localhost:8000
 ```
+The API is served under `http://localhost:8000/api` (e.g. `GET /api/boards`).
 
-### Frontend (React)
+### 2. Frontend (React + Vite)
 ```bash
 cd frontend
 npm install
-npm run dev                  # http://localhost:5173
+echo "VITE_API_URL=http://localhost:8000/api" > .env
+npm run dev                          # http://localhost:5173
 ```
-
-Copy `.env.example` → `.env` at the repo root and fill in your own tokens/keys. **Never commit real ones.**
+Open `http://localhost:5173` — create a board, add lists/cards, move cards, tag them, assign a member, set a due date.
 
 ## Repo layout
 
 ```
-backend/        Laravel API (built by the agents)
-frontend/       React UI (built by the agents)
-skills/         Hermes skills (status-report)
-agent-log.md    Unedited chat-loop log (human -> plan -> code -> report)
-ARCHITECTURE.md System design, channels, model routing
+backend/         Laravel API + SQLite (built by the agents)
+frontend/        React UI (built by the agents)
+skills/          Hermes skill (status-report)
+agent-log.md     Unedited chat-loop log (human → plan → code → report)
+ARCHITECTURE.md  System design, Slack channels, model routing
+.env.example     Env vars for the agent setup (never commit real keys)
 ```
+
+## How it was built
+
+Every line of the app was written by the agents through the Slack loop — a human posts a goal, Hermes (brain) plans it, OpenClaw (hands) writes and runs the code in `#agent_coder` and reports back. The raw exchanges are in [`agent-log.md`](agent-log.md).
