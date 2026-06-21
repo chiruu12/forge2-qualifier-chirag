@@ -5,7 +5,7 @@
 ```mermaid
 flowchart LR
     H["You<br/>#sprint-main"] -->|goal| B["Hermes — Brain<br/>Groq gpt-oss-120b"]
-    B -->|plan + task| C["OpenClaw — Hands<br/>Ollama qwen2.5-coder"]
+    B -->|plan + task| C["OpenClaw — Hands<br/>LFM 2.5 (LM Studio)"]
     C -->|writes & runs code| Repo[("Repo: backend + frontend")]
     C -->|What I Did / What's Left / What Needs Your Call| H
     B -. "memory + skill + cron" .-> Log["#agent-log"]
@@ -28,15 +28,17 @@ flowchart LR
 | Agent | Model | Endpoint |
 |-------|-------|----------|
 | Hermes (planning) | Groq `openai/gpt-oss-120b` | `https://api.groq.com/openai/v1` |
-| OpenClaw (coding) | Ollama `qwen2.5-coder:7b` | `http://localhost:11434/v1` |
+| OpenClaw (coding) | LFM 2.5 (LM Studio) | `http://localhost:1234/v1` |
 
 **Why this split:**
 
 - **Planning is bursty and high-value** — it benefits from a strong model. Groq's `gpt-oss-120b` is fast and free, ideal for short reasoning/decomposition calls.
-- **Coding is token-heavy and continuous.** Running `qwen2.5-coder` locally on Ollama means OpenClaw never trips Groq's low free-tier rate limit (TPM), and the model is coding-specialised, so it writes better Laravel/React.
-- **Reproducible:** Ollama serves a GGUF model that runs on any machine — the setup isn't tied to specific hardware.
+- **Execution runs locally and free.** The hands run LFM 2.5 — a small, efficient local model served by LM Studio — so OpenClaw never hits any paid API or cloud rate limit. The whole coding loop runs offline on the machine.
+- **A deliberate test of a lightweight executor:** keeping the brain strong (cloud) and the hands small (local) shows the orchestration pattern works even with a compact local model doing the typing.
 
-**Fallback ladder (on 429):** Groq `gpt-oss-120b` → Gemini `gemini-2.5-flash` → OpenRouter `:free` → Ollama (local, unlimited).
+**Free stack:** no paid models or subscriptions anywhere — Groq's free tier for planning, a local model for execution.
+
+**Fallback ladder (on 429 / failure):** Groq `gpt-oss-120b` → Gemini `gemini-2.5-flash` → OpenRouter `:free` → local model (offline, unlimited).
 
 ## Memory, skill, autonomous run
 

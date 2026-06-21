@@ -18,7 +18,7 @@ A small Kanban board: **Boards → Lists → Cards**, with card details, coloure
 | Role | Model | Endpoint | Why |
 |------|-------|----------|-----|
 | Brain / planning (Hermes) | Groq `openai/gpt-oss-120b` | `https://api.groq.com/openai/v1` | Strong, fast planner for decomposition; short bursty calls fit Groq's free tier. |
-| Hands / coding (OpenClaw) | Ollama `qwen2.5-coder:7b` | `http://localhost:11434/v1` | Coding-specialised; runs locally so heavy token use never hits Groq's free rate limits. Reproducible GGUF. |
+| Hands / coding (OpenClaw) | LFM 2.5 (LM Studio) | `http://localhost:1234/v1` | A small, fast local model running fully offline — demonstrating a lightweight local executor. No paid API, no rate limits. |
 
 No paid models or subscriptions. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the routing rationale.
 
