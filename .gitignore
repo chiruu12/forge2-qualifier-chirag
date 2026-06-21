@@ -32,3 +32,6 @@ TOOLS.md
 USER.md
 openclaw-workspace-state.json
 .context/
+
+# agent test artifact (from the Slack loop demo)
+hello_forge.py
