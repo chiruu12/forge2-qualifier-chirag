@@ -24,7 +24,9 @@ A small Kanban board: **Boards → Lists → Cards**, with card details, coloure
 
 ## Live URL
 
-> _<add your deployed Vercel frontend URL here before submitting>_
+**https://frontend-lyart-ten-d0rh6z68nc.vercel.app**
+
+> The frontend is deployed on Vercel. The Laravel API runs locally (see **Run locally**); with the backend on `localhost:8000` the board is fully interactive — shown in the demo video. (Per the qualifier rules, a live frontend + runnable backend + video qualifies.)
 
 ## Run locally
 
