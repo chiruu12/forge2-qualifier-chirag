@@ -27,3 +27,4 @@ header { margin-bottom: 16px; }
 .add-col input { background: #ffffff; }
 .err { color: #fff; background: #b91c1c; padding: 12px; border-radius: 6px; line-height: 1.6; }
 code { background: #00000033; padding: 2px 6px; border-radius: 4px; }
+.banner { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; }
