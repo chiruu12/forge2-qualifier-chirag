@@ -8,13 +8,12 @@ source "$ROOT/scripts/ports.sh"
 
 API="${1:-$LARAVEL_API_URL}"
 
-CURL_OPTS=()
-if echo "$API" | grep -qi ngrok; then
-  CURL_OPTS+=(-H "ngrok-skip-browser-warning: true")
-fi
-
 echo "Checking $API/boards ..."
-HTTP=$(curl -s "${CURL_OPTS[@]}" -o /tmp/forge2-boards.json -w "%{http_code}" "$API/boards" || true)
+if echo "$API" | grep -qi ngrok; then
+  HTTP=$(curl -s -H "ngrok-skip-browser-warning: true" -o /tmp/forge2-boards.json -w "%{http_code}" "$API/boards" || true)
+else
+  HTTP=$(curl -s -o /tmp/forge2-boards.json -w "%{http_code}" "$API/boards" || true)
+fi
 
 if [ "$HTTP" = "200" ]; then
   if ! python3 -c "import json; json.load(open('/tmp/forge2-boards.json'))" 2>/dev/null; then
