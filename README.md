@@ -72,6 +72,7 @@ ngrok http 7900                 # terminal 2 → update Vercel VITE_API_URL
 | Human approval gates (goal → plan → review) | [`agent-log.md`](agent-log.md) § Human-in-the-loop |
 | Cross-session memory (Session A save → B recall) | [`agent-log.md`](agent-log.md) § Memory recall |
 | `status-report` skill (3-section format) | [`skills/status-report/SKILL.md`](skills/status-report/SKILL.md) |
+| Agent skills + Slack evidence guide | [`skills/README.md`](skills/README.md), [`docs/SLACK_EVIDENCE.md`](docs/SLACK_EVIDENCE.md) |
 | Autonomous cron to `#agent_log` | [`hermes-config.yaml`](hermes-config.yaml), [`agent-log.md`](agent-log.md) § Autonomous run |
 
 Raw Slack transcripts and screenshots: [`agent-log.md`](agent-log.md), [`docs/`](docs/).

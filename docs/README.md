@@ -12,7 +12,7 @@ Commit these five PNGs here (also mirrored in the submission Drive folder):
 | `hermes-skill.png` | `#sprint_main` — status-report three-section output |
 | `hermes-cron.png` | `#agent_log` — timestamped autonomous cron post |
 
-Referenced from [`agent-log.md`](../agent-log.md). Full verbatim transcripts are in that file even without screenshots.
+Referenced from [`agent-log.md`](../agent-log.md). **Slack prompts + screenshot steps:** [`SLACK_EVIDENCE.md`](SLACK_EVIDENCE.md).
 
 **Capture tips:**
 - Include model name (`lfm2.5-1.2b-thinking-mlx` / `liquid/lfm2.5-1.2b`) in LM Studio UI.
