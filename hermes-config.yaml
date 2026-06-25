@@ -10,7 +10,8 @@ model:
   provider: custom
   base_url: http://127.0.0.1:1234/v1
   max_tokens: 4096
-  context_length: 32768
+  # Hermes requires >= 64K; must match LM Studio load context for thinking-mlx
+  context_length: 90112
   api_key: lm-studio
 
 toolsets:

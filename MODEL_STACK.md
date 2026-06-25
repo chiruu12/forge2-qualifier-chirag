@@ -26,6 +26,17 @@ Both models share one LM Studio server on port **1234** — routed by model ID.
 | **Laravel API** (Kanban) | **7900** | `http://localhost:7900/api` |
 | **OpenClaw gateway** | **18789** | `ws://127.0.0.1:18789` (Slack bridge) |
 
+## Hermes context (brain model)
+
+Hermes requires **≥ 64,000** tokens in `model.context_length` (`hermes-config.yaml`). It does **not** read LM Studio's loaded context automatically — set this explicitly.
+
+| Setting | Value |
+|---------|-------|
+| LM Studio load context | **90112** (or ≥65536) on `lfm2.5-1.2b-thinking-mlx` |
+| `hermes-config.yaml` | `context_length: 90112` |
+
+If you see `below the minimum 64,000 required by Hermes Agent`, bump both values and restart Hermes.
+
 ## OpenClaw context + tools (1.2B models)
 
 Small models need tuned OpenClaw settings (see `openclaw.json`):
