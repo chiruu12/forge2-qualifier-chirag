@@ -2,18 +2,22 @@
 # Validate LM Studio: both MLX models listed + short completion test each.
 set -euo pipefail
 
-BASE_URL="${LMSTUDIO_BASE_URL:-http://localhost:1234/v1}"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=ports.sh
+source "$ROOT/scripts/ports.sh"
+
+BASE_URL="${LMSTUDIO_BASE_URL}"
 HERMES_MODEL="${HERMES_MODEL:-lfm2.5-1.2b-thinking-mlx}"
 OPENCLAW_MODEL="${OPENCLAW_MODEL:-liquid/lfm2.5-1.2b}"
 
-echo "==> LM Studio @ $BASE_URL"
+echo "==> LM Studio @ $BASE_URL (port $LMSTUDIO_PORT)"
 echo "    Hermes model:   $HERMES_MODEL"
 echo "    OpenClaw model: $OPENCLAW_MODEL"
 echo ""
 
 if ! curl -sf "$BASE_URL/models" -o /tmp/forge2-models.json; then
   echo "FAIL — LM Studio not reachable on $BASE_URL"
-  echo "      Open LM Studio → load both MLX models → enable Local Server (port 1234)"
+  echo "      LM Studio → Settings → Local Server → port $LMSTUDIO_PORT → Start"
   exit 1
 fi
 
@@ -68,5 +72,5 @@ if [ "$FAIL" -eq 0 ]; then
 fi
 
 echo ""
-echo "Fix: ensure both MLX models are loaded in LM Studio and Local Server is on port 1234."
+echo "Fix: load both MLX models in LM Studio, Local Server on port $LMSTUDIO_PORT."
 exit 1

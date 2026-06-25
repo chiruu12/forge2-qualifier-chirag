@@ -1,39 +1,30 @@
 # Open-source model stack (Liquid AI MLX)
 
-This project runs on **fully open-weight Liquid AI models** served locally via LM Studio on Apple Silicon (MLX). No paid API keys, no closed-source orchestrators.
+## Port map
 
-## Active models (your LM Studio setup)
+| Service | Port | URL |
+|---------|------|-----|
+| **LM Studio** (agents) | **7900** | `http://localhost:7900/v1` |
+| **Laravel API** (Kanban) | **7901** | `http://localhost:7901/api` |
 
-| Role | Agent | LM Studio model ID | Quantization | Purpose |
-|------|-------|-------------------|--------------|---------|
-| **Reasoning / planning** | Hermes (brain) | `lfm2.5-1.2b-thinking-mlx` | 4-bit MLX | Goal decomposition, plan approval |
-| **Execution / coding** | OpenClaw (hands) | `liquid/lfm2.5-1.2b` | 8-bit MLX | Tool calls, file edits, shell runs |
+Set LM Studio → **Settings → Local Server → Port 7900**.
 
-Both models run on **one LM Studio Local Server** at `http://localhost:1234/v1`. The API routes by model ID — no port swapping.
+## Active models
 
-## Setup
+| Role | Agent | LM Studio model ID | Quantization |
+|------|-------|-------------------|--------------|
+| **Brain** | Hermes | `lfm2.5-1.2b-thinking-mlx` | 4-bit MLX |
+| **Hands** | OpenClaw | `liquid/lfm2.5-1.2b` | 8-bit MLX |
 
-1. Open **LM Studio** → download/load both MLX models:
-   - `lfm2.5-1.2b-thinking-mlx` (4-bit)
-   - `liquid/lfm2.5-1.2b` (8-bit)
-2. Enable **Local Server** on port **1234**.
-3. Validate:
+Both models on one LM Studio server (port **7900**), routed by model ID.
+
+## Validate
 
 ```bash
-./scripts/verify-models.sh   # lists models + runs test completions
-./scripts/verify-all.sh      # models + Laravel API
+./scripts/verify-models.sh    # LM Studio :7900
+./scripts/start-live-demo.sh  # Laravel :7901
+./scripts/verify-all.sh       # both
+ngrok http 7901               # live demo tunnel
 ```
 
-## Config files
-
-- `hermes-config.yaml` — brain → `lfm2.5-1.2b-thinking-mlx`
-- `openclaw.json` — hands → `liquid/lfm2.5-1.2b`
-- `.env.example` — model IDs and base URL
-
-## What we rejected
-
-| Option | Problem |
-|--------|---------|
-| **Sakana Fugu** | Closed-source cloud API |
-| **OpenAI / Fireworks** | Paid APIs |
-| **LFM2-Tool** | Superseded by LFM2.5-Instruct family for this stack |
+Override ports: `LMSTUDIO_PORT=7900 LARAVEL_PORT=7901 ./scripts/verify-all.sh`

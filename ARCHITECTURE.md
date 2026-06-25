@@ -28,8 +28,8 @@ flowchart LR
 
 | Agent | Model | HF source | Endpoint |
 |-------|-------|-----------|----------|
-| Hermes (planning) | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit | LM Studio `:1234/v1` |
-| OpenClaw (coding) | `liquid/lfm2.5-1.2b` | MLX 8-bit | LM Studio `:1234/v1` |
+| Hermes (planning) | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit | LM Studio `:7900/v1` |
+| OpenClaw (coding) | `liquid/lfm2.5-1.2b` | MLX 8-bit | LM Studio `:7900/v1` |
 
 **Why this split:** Thinking MLX decomposes goals; Instruct MLX executes tool calls. Single LM Studio server — both model IDs registered, routed per request.
 
@@ -40,7 +40,7 @@ Full rationale and rejected alternatives: [`MODEL_STACK.md`](MODEL_STACK.md).
 ## Live deployment
 
 ```
-Vercel (React)  →  ngrok HTTPS  →  localhost:8000 (Laravel + SQLite)
+Vercel (React)  →  ngrok HTTPS  →  localhost:7901 (Laravel + SQLite)
 ```
 
 See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser demo mode during judging.
@@ -57,8 +57,8 @@ See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser dem
 
 ## Config files (secrets removed)
 
-- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b` @ `:1234`
-- `hermes-config.yaml` — Hermes; `lfm2.5-1.2b-thinking-mlx` @ `:1234`
+- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b` @ `:7900`
+- `hermes-config.yaml` — Hermes; `lfm2.5-1.2b-thinking-mlx` @ `:7900`
 - `MODEL_STACK.md` — open-source model selection and migration notes
 - `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5`
 - `.env.example` — Slack + LM Studio vars (no paid keys)

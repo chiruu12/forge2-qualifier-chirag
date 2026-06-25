@@ -1,5 +1,5 @@
 {
-  "_comment": "OpenClaw (hands/coder). liquid/lfm2.5-1.2b MLX 8-bit on LM Studio :1234. Brain: lfm2.5-1.2b-thinking-mlx on same server.",
+  "_comment": "OpenClaw (hands/coder). liquid/lfm2.5-1.2b MLX 8-bit on LM Studio :7900. Brain: lfm2.5-1.2b-thinking-mlx on same server.",
   "agents": {
     "defaults": {
       "workspace": "<repo-root>",
@@ -31,7 +31,7 @@
     "mode": "merge",
     "providers": {
       "lmstudio": {
-        "baseUrl": "http://localhost:1234/v1",
+        "baseUrl": "http://localhost:7900/v1",
         "apiKey": "lm-studio",
         "api": "openai-completions",
         "contextWindow": 32768,

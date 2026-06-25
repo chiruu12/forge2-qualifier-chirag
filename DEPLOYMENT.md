@@ -2,29 +2,34 @@
 
 The Vercel frontend must reach a **live Laravel API**. We tunnel the local API through ngrok so judges see real data, not browser demo mode.
 
+## Port map
+
+| Service | Port |
+|---------|------|
+| LM Studio (agents) | **7900** |
+| Laravel API | **7901** |
+| ngrok target | **7901** |
+
 ## Architecture
 
 ```
-Browser → Vercel (React) → ngrok HTTPS URL → localhost:8000 (Laravel + SQLite)
+Browser → Vercel (React) → ngrok HTTPS URL → localhost:7901 (Laravel + SQLite)
 ```
 
 ## Step-by-step
 
 ### 1. Start LM Studio (agents — optional for judging Kanban only)
 
-Load in LM Studio (MLX):
+1. Load `lfm2.5-1.2b-thinking-mlx` (4-bit) and `liquid/lfm2.5-1.2b` (8-bit)
+2. LM Studio → Settings → Local Server → port **7900** → Start
+3. Verify: `./scripts/verify-models.sh`
 
-1. `lfm2.5-1.2b-thinking-mlx` (4-bit) — Hermes brain
-2. `liquid/lfm2.5-1.2b` (8-bit) — OpenClaw hands
-3. Local Server on port **1234**
-4. Verify: `./scripts/verify-models.sh`
-
-See [`MODEL_STACK.md`](MODEL_STACK.md) for download links and why closed APIs (e.g. Sakana Fugu) were not used.
+See [`MODEL_STACK.md`](MODEL_STACK.md).
 
 ### 2. Start Laravel API
 
 ```bash
-chmod +x scripts/start-live-demo.sh scripts/verify-api.sh
+chmod +x scripts/*.sh
 ./scripts/start-live-demo.sh
 ```
 
@@ -35,71 +40,60 @@ cd backend
 composer install
 cp .env.example .env && php artisan key:generate
 php artisan migrate:fresh --seed
-php artisan serve --host=0.0.0.0 --port=8000
+php artisan serve --host=0.0.0.0 --port=7901
 ```
 
-Verify locally:
+Verify:
 
 ```bash
-./scripts/verify-api.sh http://localhost:8000/api
+./scripts/verify-api.sh http://localhost:7901/api
 ```
 
 ### 3. Start ngrok
 
-In a second terminal:
-
 ```bash
-ngrok http 8000
+ngrok http 7901
 ```
-
-Copy the **https** forwarding URL, e.g. `https://abc123.ngrok-free.app`.
 
 Verify through ngrok:
 
 ```bash
-./scripts/verify-api.sh https://abc123.ngrok-free.app/api
+./scripts/verify-api.sh https://YOUR-SUBDOMAIN.ngrok-free.app/api
 ```
 
 ### 4. Point Vercel frontend at ngrok
 
-In the Vercel project settings → Environment Variables:
-
 ```
-VITE_API_URL=https://abc123.ngrok-free.app/api
+VITE_API_URL=https://YOUR-SUBDOMAIN.ngrok-free.app/api
 ```
 
-Redeploy the frontend. Open the live URL — the yellow **demo banner must NOT appear**; board data comes from SQLite via the API.
+Redeploy. The yellow **demo banner must NOT appear**.
 
 ### 5. During judging
 
 Keep running:
 
-- Laravel (`php artisan serve`)
-- ngrok (`ngrok http 8000`)
+- Laravel on port **7901**
+- ngrok: `ngrok http 7901`
 
-If ngrok restarts, the URL changes — update `VITE_API_URL` in Vercel and redeploy.
+Full check: `./scripts/verify-all.sh`
 
 ## Reserved ngrok domain (recommended)
 
-A paid/reserved ngrok subdomain avoids redeploying Vercel on every restart:
-
 ```bash
-ngrok http 8000 --domain=your-reserved.ngrok-free.app
+ngrok http 7901 --domain=your-reserved.ngrok-free.app
 ```
-
-Set `VITE_API_URL=https://your-reserved.ngrok-free.app/api` once in Vercel.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| Yellow "Frontend demo" banner | API unreachable — check ngrok + Laravel are running |
-| CORS errors | Already open (`backend/config/cors.php` allows `*`) |
-| Empty boards | Run `php artisan migrate:fresh --seed` |
-| ngrok browser warning | Click through once; API calls from Vercel are unaffected |
+| Yellow "Frontend demo" banner | API unreachable — check ngrok + Laravel on **7901** |
+| Models fail verify | LM Studio Local Server must be on **7900** |
+| Port in use | `LARAVEL_PORT=7902 ./scripts/start-live-demo.sh` |
 
 ## Live URL
 
 **Frontend:** https://frontend-lyart-ten-d0rh6z68nc.vercel.app
 
-**Backend (when demo running):** your ngrok URL + `/api/boards`
+**Backend (when demo running):** ngrok URL + `/api/boards`

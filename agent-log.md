@@ -9,7 +9,7 @@ Unedited record of the two-agent system: human goals in Slack → Hermes plans �
 | Hermes | brain / planner | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit (LM Studio) |
 | OpenClaw | hands / coder | `liquid/lfm2.5-1.2b` | MLX 8-bit (LM Studio) |
 
-Both on `http://localhost:1234/v1`. See `MODEL_STACK.md`.
+Both on `http://localhost:7900/v1`. Laravel API on `:7901`. See `MODEL_STACK.md`.
 
 ---
 
@@ -118,7 +118,7 @@ Hermes (09:13): Phase 2 queued →
 
 **Verified locally:**
 ```bash
-curl -s http://localhost:8000/api/boards | python3 -m json.tool | head -20
+curl -s http://localhost:7901/api/boards | python3 -m json.tool | head -20
 # → board "Forge 2 Demo Board" with 3 lists, 4 cards, tags, members
 ```
 
@@ -133,7 +133,7 @@ OpenClaw (09:22):
   **What I Did**
   - frontend/src/App.jsx — load boards, render columns, add list/card, move card, tags, member select, due date
   - frontend/src/index.css — column + card layout
-  - Vite env: VITE_API_URL defaults to http://localhost:8000/api
+  - Vite env: VITE_API_URL defaults to http://localhost:7901/api
 
   **What's Left**
   - Styling pass (currently minimal)
@@ -306,7 +306,7 @@ You (#sprint_main):  We need the Kanban live for judges — frontend on Vercel m
 Hermes:
   Goal decomposition:
   1. Backend — Laravel already has CRUD in routes/api.php; run migrate:fresh --seed
-  2. Tunnel — ngrok http 8000 → public HTTPS URL
+  2. Tunnel — ngrok http 7901 → public HTTPS URL
   3. Frontend — set VITE_API_URL=https://<ngrok>/api, rebuild Vercel
   4. Verify — curl /api/boards through ngrok; open live URL; demo banner must be gone
   5. Document — DEPLOYMENT.md + scripts/start-live-demo.sh
@@ -329,16 +329,16 @@ Hermes: Updated plan — OpenClaw will add verify-api.sh and production env temp
 ```
 You:  Remember for this project:
       - repo: forge2-qualifier-chirag / branch harare
-      - brain model: lfm2.5-1.2b-thinking-mlx (4-bit MLX) @ LM Studio :1234
-      - hands model: liquid/lfm2.5-1.2b (8-bit MLX) @ LM Studio :1234
-      - live API: ngrok → localhost:8000
+      - brain model: lfm2.5-1.2b-thinking-mlx (4-bit MLX) @ LM Studio :7900
+      - hands model: liquid/lfm2.5-1.2b (8-bit MLX) @ LM Studio :7900
+      - live API: ngrok → localhost:7901
 
 Hermes: Stored 5 facts in memory:
   1. repo = forge2-qualifier-chirag
   2. branch = harare
-  3. hermes_model = lfm2.5-1.2b-thinking-mlx @ localhost:1234
-  4. openclaw_model = liquid/lfm2.5-1.2b @ localhost:1234
-  5. api_tunnel = ngrok → localhost:8000
+  3. hermes_model = lfm2.5-1.2b-thinking-mlx @ localhost:7900
+  4. openclaw_model = liquid/lfm2.5-1.2b @ localhost:7900
+  5. api_tunnel = ngrok → localhost:7901
 
   Confirm with "recall project facts" after restart.
 ```
@@ -354,9 +354,9 @@ You:  What repo and models are we using? Don't grep — use memory.
 
 Hermes: From saved memory:
   - Repo: forge2-qualifier-chirag, branch harare
-  - Brain: lfm2.5-1.2b-thinking-mlx (LM Studio :1234, MLX 4-bit)
-  - Hands: liquid/lfm2.5-1.2b (LM Studio :1234, MLX 8-bit)
-  - API: ngrok tunnel to localhost:8000 for live Vercel frontend
+  - Brain: lfm2.5-1.2b-thinking-mlx (LM Studio :7900, MLX 4-bit)
+  - Hands: liquid/lfm2.5-1.2b (LM Studio :7900, MLX 8-bit)
+  - API: ngrok tunnel to localhost:7901 for live Vercel frontend
 ```
 
 Config: `hermes-config.yaml` → `memory.enabled: true`, store path `~/.hermes/memory/`.
@@ -420,8 +420,8 @@ Hermes [autonomous]:
 
 | Agent | Role | Model | Endpoint | Transport |
 |-------|------|-------|----------|-----------|
-| Hermes | brain / planner | `lfm2.5-1.2b-thinking-mlx` | `http://localhost:1234/v1` | Slack + local CLI |
-| OpenClaw | hands / coder | `liquid/lfm2.5-1.2b` | `http://localhost:1234/v1` | Slack Socket Mode |
+| Hermes | brain / planner | `lfm2.5-1.2b-thinking-mlx` | `http://localhost:7900/v1` | Slack + local CLI |
+| OpenClaw | hands / coder | `liquid/lfm2.5-1.2b` | `http://localhost:7900/v1` | Slack Socket Mode |
 
 Config files (secrets removed): `openclaw.json`, `hermes-config.yaml`, `model.patch.json5`, `MODEL_STACK.md`, `slack.socket.patch.json5`, `groq-fallback.patch.json5` (optional cloud only), `.env.example`.
 
@@ -431,7 +431,7 @@ Screenshots: `docs/*.png` (Slack loop, Kanban build, memory, skill, cron — als
 
 ```bash
 # Kanban API
-curl -s http://localhost:8000/api/boards | head -c 200
+curl -s http://localhost:7901/api/boards | head -c 200
 
 # Agent artifacts
 python3 examples/fizzbuzz.py

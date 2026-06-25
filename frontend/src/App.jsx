@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:7901/api'
 const API_LABEL = API.replace(/^https?:\/\//, '').replace(/\/api$/, '')
 
 const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }

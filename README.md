@@ -20,10 +20,10 @@ Kanban: **Boards → Lists → Cards**, with tags, members, due dates, drag-and-
 
 | Role | Model | Source | Endpoint |
 |------|-------|--------|----------|
-| **Brain** (Hermes) | `lfm2.5-1.2b-thinking-mlx` | LFM2.5-Thinking MLX 4-bit | `http://localhost:1234/v1` |
-| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b` | LFM2.5-Instruct MLX 8-bit | `http://localhost:1234/v1` |
+| **Brain** (Hermes) | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit | `http://localhost:7900/v1` |
+| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b` | MLX 8-bit | `http://localhost:7900/v1` |
 
-Both models on **one LM Studio server** (port 1234), routed by model ID.
+Both on LM Studio port **7900**. Laravel API on port **7901**.
 
 ## Live URL
 
@@ -36,8 +36,8 @@ Both models on **one LM Studio server** (port 1234), routed by model ID.
 ### Agents (LM Studio MLX)
 
 1. Load both models in LM Studio (see [`MODEL_STACK.md`](MODEL_STACK.md)).
-2. Enable **Local Server** on port **1234**.
-3. Verify: `./scripts/verify-models.sh` or `./scripts/verify-all.sh`
+2. LM Studio → Local Server on port **7900**.
+3. Verify: `./scripts/verify-models.sh`
 
 ### Backend
 
@@ -46,7 +46,7 @@ cd backend
 composer install
 cp .env.example .env && php artisan key:generate
 php artisan migrate:fresh --seed
-php artisan serve --host=0.0.0.0 --port=8000
+php artisan serve --host=0.0.0.0 --port=7901
 ```
 
 ### Frontend
@@ -54,7 +54,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 ```bash
 cd frontend
 npm install
-echo "VITE_API_URL=http://localhost:8000/api" > .env
+echo "VITE_API_URL=http://localhost:7901/api" > .env
 npm run dev
 ```
 
@@ -62,7 +62,7 @@ npm run dev
 
 ```bash
 ./scripts/start-live-demo.sh    # terminal 1
-ngrok http 8000                 # terminal 2 → update Vercel VITE_API_URL
+ngrok http 7901                 # terminal 2 → update Vercel VITE_API_URL
 ```
 
 ## Human-in-the-loop, memory, skill
@@ -89,8 +89,8 @@ BUILD_CHRONOLOGY.md Slack goals mapped to git commits and files
 ARCHITECTURE.md    System design
 MODEL_STACK.md     Open-source Liquid AI model choices (Thinking + Tool)
 DEPLOYMENT.md      ngrok + Vercel live demo
-openclaw.json      OpenClaw config (liquid/lfm2.5-1.2b @ :1234)
-hermes-config.yaml Hermes config (lfm2.5-1.2b-thinking-mlx @ :1234)
+openclaw.json      OpenClaw config (liquid/lfm2.5-1.2b @ :7900)
+hermes-config.yaml Hermes config (lfm2.5-1.2b-thinking-mlx @ :7900)
 .env.example       Env template (no paid keys)
 ```
 

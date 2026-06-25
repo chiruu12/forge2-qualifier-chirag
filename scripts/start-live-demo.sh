@@ -4,18 +4,19 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BACKEND="$ROOT/backend"
+# shellcheck source=ports.sh
+source "$ROOT/scripts/ports.sh"
 
 echo "==> Forge 2 live demo — Laravel + ngrok"
+echo "    Laravel port: $LARAVEL_PORT"
 echo ""
 
-if lsof -i :8000 -sTCP:LISTEN >/dev/null 2>&1; then
-  echo "WARNING: port 8000 is already in use."
-  echo "         Stop the other process first, or run: php artisan serve --host=0.0.0.0 --port=8001"
-  echo "         (then: ngrok http 8001)"
+if lsof -i :"$LARAVEL_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "WARNING: port $LARAVEL_PORT is already in use."
+  echo "         Stop the other process or set LARAVEL_PORT=7902 ./scripts/start-live-demo.sh"
   echo ""
 fi
 
-# Backend setup
 cd "$BACKEND"
 if [ ! -f .env ]; then
   cp .env.example .env
@@ -26,19 +27,19 @@ echo "==> Running migrations + seed..."
 php artisan migrate:fresh --seed --force
 
 echo ""
-echo "==> Starting Laravel on http://0.0.0.0:8000"
-echo "    API: http://localhost:8000/api/boards"
+echo "==> Starting Laravel on http://0.0.0.0:$LARAVEL_PORT"
+echo "    API: $LARAVEL_API_URL/boards"
 echo ""
 echo "==> In a SECOND terminal, run:"
-echo "    ngrok http 8000"
+echo "    ngrok http $LARAVEL_PORT"
 echo ""
-echo "==> Copy the https URL (e.g. https://abc123.ngrok-free.app) and set in Vercel:"
+echo "==> Copy the https URL and set in Vercel:"
 echo "    VITE_API_URL=https://<ngrok-subdomain>.ngrok-free.app/api"
 echo ""
-echo "==> Verify API is reachable:"
-echo "    curl -s https://<ngrok-subdomain>.ngrok-free.app/api/boards | head"
+echo "==> Verify:"
+echo "    ./scripts/verify-api.sh $LARAVEL_API_URL"
 echo ""
 echo "Keep BOTH this server and ngrok running while judges review the live URL."
 echo ""
 
-php artisan serve --host=0.0.0.0 --port=8000
+php artisan serve --host=0.0.0.0 --port="$LARAVEL_PORT"

@@ -3,7 +3,7 @@
     mode: "merge",
     providers: {
       lmstudio: {
-        baseUrl: "http://localhost:1234/v1",
+        baseUrl: "http://localhost:7900/v1",
         apiKey: "lm-studio",
         api: "openai-completions",
         contextWindow: 32768,

@@ -3,9 +3,13 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-API="${1:-http://localhost:8000/api}"
+# shellcheck source=ports.sh
+source "$ROOT/scripts/ports.sh"
+
+API="${1:-$LARAVEL_API_URL}"
 
 echo "========== Forge 2 validation =========="
+echo "LM Studio port: $LMSTUDIO_PORT | Laravel port: $LARAVEL_PORT"
 echo ""
 
 FAIL=0
