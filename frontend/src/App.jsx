@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:7900/api'
+const API_LABEL = API.replace(/^https?:\/\//, '').replace(/\/api$/, '')
+const IS_NGROK = /ngrok/i.test(API)
+const apiHeaders = (extra = {}) => ({
+  ...(IS_NGROK ? { 'ngrok-skip-browser-warning': 'true' } : {}),
+  ...extra,
+})
+const apiFetch = (url, opts = {}) =>
+  fetch(url, { ...opts, headers: apiHeaders(opts.headers || {}) })
 
 const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
 function dueInfo(due) {
@@ -47,6 +55,7 @@ const COL_COLORS = ['#64748b', '#7c8cff', '#22d3ee', '#34d399', '#f59e0b', '#f47
 export default function App() {
   const [board, setBoard] = useState(null)
   const [demo, setDemo] = useState(false)
+  const [apiOk, setApiOk] = useState(false)
   const [newList, setNewList] = useState('')
   const [q, setQ] = useState('')
   const [dragId, setDragId] = useState(null)
@@ -54,17 +63,17 @@ export default function App() {
 
   const load = async () => {
     try {
-      const res = await fetch(`${API}/boards`)
+      const res = await apiFetch(`${API}/boards`)
       if (!res.ok) throw new Error('http ' + res.status)
       const boards = await res.json()
-      setBoard(boards[0] || demoBoard()); setDemo(false)
-    } catch { setBoard(demoBoard()); setDemo(true) }
+      setBoard(boards[0] || demoBoard()); setDemo(false); setApiOk(true)
+    } catch { setBoard(demoBoard()); setDemo(true); setApiOk(false) }
   }
   useEffect(() => { load() }, [])
 
-  const POST = (u, b) => fetch(`${API}${u}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
-  const PATCH = (u, b) => fetch(`${API}${u}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
-  const DEL = (u) => fetch(`${API}${u}`, { method: 'DELETE' })
+  const POST = (u, b) => apiFetch(`${API}${u}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+  const PATCH = (u, b) => apiFetch(`${API}${u}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+  const DEL = (u) => apiFetch(`${API}${u}`, { method: 'DELETE' })
   const apply = async (localFn, apiCall) => {
     if (demo) { setBoard(b => { const nb = structuredClone(b); localFn(nb); return nb }); return }
     try { await apiCall(); await load() }
@@ -86,18 +95,23 @@ export default function App() {
   const addList = (name) => apply(nb => nb.lists.push({ id: nid(), name, cards: [] }), () => POST(`/boards/${board.id}/lists`, { name }))
   const addMember = (name) => apply(nb => nb.members.push({ id: nid(), name }), () => POST(`/boards/${board.id}/members`, { name }))
   const addCard = (listId, title) => apply(nb => nb.lists.find(l => l.id === listId).cards.push({ id: nid(), list_id: listId, title, description: null, member_id: null, member: null, due_date: null, tags: [] }), () => POST(`/lists/${listId}/cards`, { title }))
-  const delCard = (card) => apply(nb => { const [l] = find(nb, card.id); l.cards = l.cards.filter(x => x.id !== card.id) }, () => DEL(`/cards/${card.id}`))
-  const moveTo = (card, listId) => { if (card.list_id === listId) return; apply(nb => { const [l, c] = find(nb, card.id); l.cards = l.cards.filter(x => x.id !== card.id); c.list_id = listId; nb.lists.find(x => x.id === listId).cards.push(c) }, () => PATCH(`/cards/${card.id}`, { list_id: listId })) }
+  const delCard = (card) => apply(nb => { const [l] = find(nb, card.id); if (!l) return; l.cards = l.cards.filter(x => x.id !== card.id) }, () => DEL(`/cards/${card.id}`))
+  const moveTo = (card, listId) => { if (card.list_id === listId) return; apply(nb => { const [l, c] = find(nb, card.id); if (!l || !c) return; l.cards = l.cards.filter(x => x.id !== card.id); const target = nb.lists.find(x => x.id === listId); if (!target) return; c.list_id = listId; target.cards.push(c) }, () => PATCH(`/cards/${card.id}`, { list_id: listId })) }
   const addTag = (card, name, color) => apply(nb => { const [, c] = find(nb, card.id); c.tags.push({ id: nid(), name, color }) }, () => POST(`/cards/${card.id}/tags`, { name, color }))
   const setMember = (card, memberId) => apply(nb => { const [, c] = find(nb, card.id); c.member_id = memberId ? Number(memberId) : null; c.member = nb.members.find(m => m.id === Number(memberId)) || null }, () => PATCH(`/cards/${card.id}`, { member_id: memberId || null }))
   const setDue = (card, due) => apply(nb => { const [, c] = find(nb, card.id); c.due_date = due || null }, () => PATCH(`/cards/${card.id}`, { due_date: due || null }))
 
   return (
     <div className="wrap">
+      {apiOk && !demo && (
+        <div className="banner connected">
+          ✓ <b>Live API connected.</b> Board data from Laravel via <code>{API_LABEL}</code> — create, move, and tag cards; changes persist in SQLite.
+        </div>
+      )}
       {demo && (
         <div className="banner">
-          🧩 <b>Frontend demo.</b> Running on sample data in your browser (no backend connected); this is the React UI only.
-          For the full app with the Laravel API and saved data, clone the repo and run it locally (see the <b>README</b>).
+          🧩 <b>Frontend demo.</b> No reachable API at <code>{API}</code> — showing sample data in your browser only.
+          Start Laravel + ngrok and set <code>VITE_API_URL</code> (see <b>DEPLOYMENT.md</b>).
         </div>
       )}
 

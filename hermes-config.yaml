@@ -1,17 +1,33 @@
-# Hermes (brain/orchestrator) config - relevant excerpt of ~/.hermes/config.yaml.
-# Secret removed: api_key is the real Fireworks key locally; here it's an env placeholder.
-# Brain = Kimi 2.6 on Fireworks, reached via the OpenAI-compatible "custom" provider.
+# Hermes (brain/orchestrator) config — excerpt of ~/.hermes/config.yaml
+# Setup: copy this file to ~/.hermes/config.yaml and export CH_AGENT_LOG from .env
+# Open-source stack: LFM2.5-Thinking MLX 4-bit via LM Studio.
+#
+# LM Studio model ID: lfm2.5-1.2b-thinking-mlx
+# Local Server port 1234 (LM Studio default — shared with OpenClaw, routed by model ID).
+# See MODEL_STACK.md
 
 model:
-  default: accounts/fireworks/models/kimi-k2p6
+  default: lfm2.5-1.2b-thinking-mlx
   provider: custom
-  base_url: https://api.fireworks.ai/inference/v1
-  max_tokens: 8192          # Fireworks/Kimi output cap
-  context_length: 131072
-  api_key: ${FIREWORKS_API_KEY}   # REMOVED - set locally in ~/.hermes/.env
+  base_url: http://127.0.0.1:1234/v1
+  max_tokens: 4096
+  # Hermes requires >= 64K; must match LM Studio load context for thinking-mlx
+  context_length: 90112
+  api_key: lm-studio
 
 toolsets:
   - hermes-cli
 
-# Memory (cross-session), the status-report skill, and a cron autonomous run
-# are all enabled and demonstrated in agent-log.md.
+memory:
+  enabled: true
+  store_path: ~/.hermes/memory/
+
+skills:
+  paths:
+    - ./skills
+
+cron:
+  - name: forge2-heartbeat
+    schedule: "*/30 * * * *"
+    channel: ${CH_AGENT_LOG}
+    prompt: "Post a one-line Forge 2 progress update using the status-report skill format."

@@ -1,0 +1,115 @@
+# Slack evidence — what to post, screenshot, and push
+
+Prerequisites: LM Studio **1234**, Laravel **7900**, `./scripts/verify-all.sh` passes.
+
+## OpenClaw local-model setup (required)
+
+| Setting | Value |
+|---------|-------|
+| LM Studio context | **32768** on `liquid/lfm2.5-1.2b` |
+| OpenClaw tools | `minimal` + `alsoAllow: [group:fs, group:runtime]` |
+| Lean mode | `localModelLean: true` |
+| Slack overflow | type `/new` in channel, then retry |
+
+Without exec tools, FizzBuzz returns a sample script instead of running Python. Without enough context, you get `LLM request failed` or `Context overflow`.
+
+Start agents:
+```bash
+./scripts/start-live-demo.sh    # Laravel :7900
+./scripts/start-openclaw.sh     # OpenClaw gateway + Slack
+hermes slack                    # Hermes brain
+```
+
+## Channels
+
+| Channel | Agent | Purpose |
+|---------|-------|---------|
+| `#sprint_main` | Hermes | Goals, plans, status |
+| `#agent_coder` | OpenClaw | Code + handoff |
+| `#agent_log` | Hermes cron | Autonomous posts |
+
+Models: **lfm2.5-1.2b-thinking-mlx** (brain) · **liquid/lfm2.5-1.2b** (hands)
+
+---
+
+## 1. FizzBuzz loop → `docs/slack-loop.png` ✅ in repo
+
+**#agent_coder** — post:
+```
+Write a Python FizzBuzz script for 1–20, run it, and paste stdout. Use code-handoff format.
+```
+Screenshot: three-section reply + stdout + model name visible.
+
+---
+
+## 2. Kanban backend → `docs/kanban-backend.png` ⚠️ Google Drive (not in-repo)
+
+**#sprint_main** — post:
+```
+Plan Phase 1: Laravel models (Board, TaskList, Card, Tag, Member), migration, routes/api.php CRUD. Use kanban-plan. Wait for my yes.
+```
+Reply `yes`. Screenshot **#agent_coder** backend handoff.
+
+---
+
+## 3. Kanban frontend → `docs/kanban-frontend.png` ⚠️ Google Drive (not in-repo)
+
+**#sprint_main** — post:
+```
+Phase 2: Wire React Kanban to http://localhost:7900/api. Proceed after my yes.
+```
+Reply `yes`. Screenshot **#agent_coder** frontend work.
+
+---
+
+## 4. Memory save → `docs/hermes-memory-save.png` ✅ in repo
+
+**#sprint_main** — post:
+```
+Remember: repo forge2-qualifier-chirag, branch kanban-score-improvement-plan, brain lfm2.5-1.2b-thinking-mlx @ 127.0.0.1:1234, hands liquid/lfm2.5-1.2b @ 127.0.0.1:1234, API localhost:7900 via ngrok.
+```
+
+---
+
+## 5. Memory recall → `docs/hermes-memory-recall.png` ✅ in repo
+
+Restart Hermes, then **#sprint_main**:
+```
+What repo, models, and API URL? Use memory only.
+```
+
+---
+
+## 6. Status skill → `docs/hermes-skill.png` ✅ in repo
+
+**#sprint_main**:
+```
+give me a status update
+```
+Screenshot: What I Did / What's Left / What Needs Your Call.
+
+---
+
+## 7. Cron → `docs/hermes-cron.png` ✅ in repo
+
+**#agent_log** — wait for cron post (no human prompt above it).
+
+---
+
+## Vercel live demo
+
+1. `./scripts/start-live-demo.sh` + `ngrok http 7900`
+2. Vercel env: `VITE_API_URL=https://<exact-ngrok-https-url>/api` (or `./scripts/deploy-vercel-live.sh`)
+3. Redeploy → open live URL → **green "Live API connected"** badge
+
+---
+
+## Final push
+
+```bash
+git add openclaw.json model.patch.json5 hermes-config.yaml docs/ scripts/
+git commit -m "Align open-source MLX stack config and evidence docs."
+git push
+```
+
+Updates [PR #1](https://github.com/chiruu12/forge2-qualifier-chirag/pull/1).

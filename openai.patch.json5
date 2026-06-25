@@ -1,1 +1,3 @@
-{ models: { providers: { openai: { apiKey: { source: "env", provider: "default", id: "OPENAI_API_KEY" } } } } }
+// DEPRECATED — replaced by free LFM2.5 stack (model.patch.json5).
+// Paid OpenAI keys are no longer used. Kept for patch history only.
+{ _deprecated: true, models: { providers: { openai: { apiKey: { source: "env", provider: "default", id: "OPENAI_API_KEY" } } } } }
