@@ -38,7 +38,9 @@ Verify: `./scripts/verify-api.sh http://localhost:7900/api`
 ngrok http 7900
 ```
 
-Set Vercel: `VITE_API_URL=https://YOUR-SUBDOMAIN.ngrok-free.dev/api`
+Set Vercel: `VITE_API_URL=https://<exact-ngrok-https-url>/api`
+
+Use the **exact HTTPS URL** from the ngrok dashboard (`.ngrok-free.app` or `.ngrok-free.dev` — both work).
 
 Or run the helper (reads ngrok from localhost:4040, sets env, redeploys):
 
@@ -60,4 +62,6 @@ Or run the helper (reads ngrok from localhost:4040, sets env, redeploys):
 | Models fail | LM Studio must be on **1234** |
 | Port 7900 busy | `LARAVEL_PORT=7902 ./scripts/start-live-demo.sh` |
 
-**Frontend:** https://frontend-lyart-ten-d0rh6z68nc.vercel.app
+**Security note:** The ngrok tunnel exposes the dev API publicly while running. Use an ephemeral URL for judging only; stop ngrok when done.
+
+**Frontend (example deploy):** https://frontend-lyart-ten-d0rh6z68nc.vercel.app — confirm your current URL with `vercel --prod` in `frontend/`.

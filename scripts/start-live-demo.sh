@@ -24,7 +24,11 @@ if [ ! -f .env ]; then
 fi
 
 echo "==> Running migrations + seed..."
-php artisan migrate:fresh --seed --force
+if [ "${FORCE_FRESH:-}" = "1" ]; then
+  php artisan migrate:fresh --seed --force
+else
+  php artisan migrate --seed --force
+fi
 
 echo ""
 echo "==> Starting Laravel on http://0.0.0.0:$LARAVEL_PORT"
@@ -34,7 +38,7 @@ echo "==> In a SECOND terminal, run:"
 echo "    ngrok http $LARAVEL_PORT"
 echo ""
 echo "==> Copy the https URL and set in Vercel:"
-echo "    VITE_API_URL=https://<ngrok-subdomain>.ngrok-free.dev/api"
+echo "    VITE_API_URL=https://<exact-ngrok-https-url>/api"
 echo "    Or: ./scripts/deploy-vercel-live.sh"
 echo ""
 echo "==> Verify:"

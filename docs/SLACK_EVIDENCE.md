@@ -42,7 +42,7 @@ Screenshot: three-section reply + stdout + model name visible.
 
 ---
 
-## 2. Kanban backend → `docs/kanban-backend.png` ⚠️ copy from Drive → commit
+## 2. Kanban backend → `docs/kanban-backend.png` ⚠️ Google Drive (not in-repo)
 
 **#sprint_main** — post:
 ```
@@ -52,7 +52,7 @@ Reply `yes`. Screenshot **#agent_coder** backend handoff.
 
 ---
 
-## 3. Kanban frontend → `docs/kanban-frontend.png` ⚠️ copy from Drive → commit
+## 3. Kanban frontend → `docs/kanban-frontend.png` ⚠️ Google Drive (not in-repo)
 
 **#sprint_main** — post:
 ```
@@ -99,17 +99,16 @@ Screenshot: What I Did / What's Left / What Needs Your Call.
 ## Vercel live demo
 
 1. `./scripts/start-live-demo.sh` + `ngrok http 7900`
-2. Vercel env: `VITE_API_URL=https://YOUR.ngrok-free.app/api`
+2. Vercel env: `VITE_API_URL=https://<exact-ngrok-https-url>/api` (or `./scripts/deploy-vercel-live.sh`)
 3. Redeploy → open live URL → **green "Live API connected"** badge
 
 ---
 
-## Final push (repo + Drive aligned)
+## Final push
 
 ```bash
-# Copy any remaining PNGs from Drive into docs/
-git add docs/*.png openclaw.json model.patch.json5 docs/ scripts/start-openclaw.sh
-git commit -m "Align open-source MLX stack config and evidence screenshots."
+git add openclaw.json model.patch.json5 hermes-config.yaml docs/ scripts/
+git commit -m "Align open-source MLX stack config and evidence docs."
 git push
 ```
 

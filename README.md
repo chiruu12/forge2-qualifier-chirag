@@ -29,7 +29,7 @@ LM Studio on **1234**. Laravel API on **7900**.
 
 **Frontend:** https://frontend-lyart-ten-d0rh6z68nc.vercel.app
 
-> **Important:** Start Laravel + ngrok before opening the live URL. Set `VITE_API_URL=https://<ngrok-subdomain>.ngrok-free.app/api` in Vercel. Without a running tunnel the UI shows demo data only. Full steps: [`DEPLOYMENT.md`](DEPLOYMENT.md).
+> **Important:** Start Laravel + ngrok before opening the live URL. Set `VITE_API_URL` to your ngrok HTTPS URL + `/api` in Vercel (copy the exact URL from the ngrok dashboard — `.app` or `.dev` both work). Without a running tunnel the UI shows demo data only. Full steps: [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## Run locally
 
@@ -38,6 +38,18 @@ LM Studio on **1234**. Laravel API on **7900**.
 1. Load both models in LM Studio (see [`MODEL_STACK.md`](MODEL_STACK.md)).
 2. LM Studio Local Server stays on **1234** (`http://127.0.0.1:1234`).
 3. Verify: `./scripts/verify-models.sh`
+
+### Hermes (brain)
+
+1. Copy [`hermes-config.yaml`](hermes-config.yaml) → `~/.hermes/config.yaml` (merge with existing if needed).
+2. Set `context_length: 90112` (Hermes requires ≥64K; must match LM Studio load context on `lfm2.5-1.2b-thinking-mlx`).
+3. Export Slack channel IDs from `.env` (`CH_AGENT_LOG`, etc.) — cron uses `${CH_AGENT_LOG}`.
+4. Start: `hermes gateway run` (or your usual Slack gateway command).
+
+### OpenClaw (hands)
+
+1. Copy repo [`openclaw.json`](openclaw.json) to `~/.openclaw/openclaw.json` and set a real `gateway.auth.token` (committed value is `REDACTED`).
+2. Start: `./scripts/start-openclaw.sh`
 
 ### Backend
 

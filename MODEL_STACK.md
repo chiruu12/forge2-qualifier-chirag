@@ -45,10 +45,12 @@ Small models need tuned OpenClaw settings (see `openclaw.json`):
 - **Tools:** `minimal` profile + `group:fs` + `group:runtime` (read/write/edit + exec — not full `coding` profile)
 - **Lean mode:** `localModelLean: true` drops browser/cron/message to save prompt tokens
 
-Apply patch to live config:
+Apply patch to live config (only if upgrading an existing OpenClaw install; otherwise use repo `openclaw.json` as-is):
 ```bash
 openclaw config patch --file model.patch.json5
 ```
+
+Set `gateway.auth.token` locally — the committed `openclaw.json` value is intentionally `REDACTED`.
 
 ## Validate
 

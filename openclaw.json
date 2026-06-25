@@ -100,6 +100,7 @@
     }
   },
   "plugins": {
+    "allow": ["slack"],
     "entries": {
       "slack": {
         "enabled": true

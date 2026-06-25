@@ -1,4 +1,5 @@
 # Hermes (brain/orchestrator) config — excerpt of ~/.hermes/config.yaml
+# Setup: copy this file to ~/.hermes/config.yaml and export CH_AGENT_LOG from .env
 # Open-source stack: LFM2.5-Thinking MLX 4-bit via LM Studio.
 #
 # LM Studio model ID: lfm2.5-1.2b-thinking-mlx

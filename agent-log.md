@@ -2,7 +2,7 @@
 
 Unedited record of the two-agent system: human goals in Slack → Hermes plans → OpenClaw executes → human approves.
 
-**Models (open-source stack, Q4 GGUF via LM Studio + HuggingFace):**
+**Models (open-source stack, Liquid AI MLX via LM Studio):**
 
 | Agent | Role | Model | Source |
 |-------|------|-------|--------|
@@ -15,7 +15,7 @@ Both on `http://127.0.0.1:1234/v1`. Laravel API on `:7900`. See `MODEL_STACK.md`
 
 ## Summary
 
-- Both agents configured on **open-weight local models** (HF GGUF, 4-bit quantization for VRAM limits).
+- Both agents configured on **open-weight local models** (MLX: 4-bit thinking brain + 8-bit instruct hands).
 - **Open-source migration:** Liquid AI MLX stack — `lfm2.5-1.2b-thinking-mlx` (brain) + `liquid/lfm2.5-1.2b` (hands). Details in `MODEL_STACK.md`.
 - **Kanban app built through the Slack loop:** human posted goals in `#sprint_main` → Hermes decomposed → OpenClaw wrote code in `#agent_coder` → human reviewed each phase before the next (see § Kanban build sprint).
 - **Human-in-the-loop:** every goal, plan approval, and code review happens in Slack — see § Human approval gates.

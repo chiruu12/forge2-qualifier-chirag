@@ -1,6 +1,6 @@
 # Kanban build chronology
 
-Maps the Slack agent loop to committed files. Full transcripts in [`agent-log.md`](../agent-log.md) § Kanban build sprint.
+Maps the Slack agent loop to committed files. Full transcripts in [`agent-log.md`](agent-log.md) § Kanban build sprint.
 
 | Commit | Date | Agent task | Key files |
 |--------|------|------------|-----------|
