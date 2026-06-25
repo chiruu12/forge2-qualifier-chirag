@@ -1,51 +1,72 @@
 #!/usr/bin/env bash
-# Health check for both LM Studio local servers (Hermes brain + OpenClaw hands).
+# Validate LM Studio: both MLX models listed + short completion test each.
 set -euo pipefail
 
-HERMES_URL="${HERMES_BASE_URL:-http://localhost:1234/v1}"
-OPENCLAW_URL="${OPENCLAW_BASE_URL:-http://localhost:1235/v1}"
-HERMES_MODEL="${HERMES_MODEL:-liquid/lfm2.5-1.2b-thinking}"
-OPENCLAW_MODEL="${OPENCLAW_MODEL:-liquid/lfm2-1.2b-tool}"
+BASE_URL="${LMSTUDIO_BASE_URL:-http://localhost:1234/v1}"
+HERMES_MODEL="${HERMES_MODEL:-lfm2.5-1.2b-thinking-mlx}"
+OPENCLAW_MODEL="${OPENCLAW_MODEL:-liquid/lfm2.5-1.2b}"
 
-check_server() {
-  local name="$1"
-  local base_url="$2"
-  local expect_model="$3"
+echo "==> LM Studio @ $BASE_URL"
+echo "    Hermes model:   $HERMES_MODEL"
+echo "    OpenClaw model: $OPENCLAW_MODEL"
+echo ""
 
-  echo "==> $name @ $base_url"
-  if ! curl -sf "$base_url/models" -o /tmp/forge2-models.json; then
-    echo "FAIL — LM Studio not reachable. Is Local Server running?"
+if ! curl -sf "$BASE_URL/models" -o /tmp/forge2-models.json; then
+  echo "FAIL — LM Studio not reachable on $BASE_URL"
+  echo "      Open LM Studio → load both MLX models → enable Local Server (port 1234)"
+  exit 1
+fi
+
+python3 - <<'PY' "$HERMES_MODEL" "$OPENCLAW_MODEL"
+import json, sys
+data = json.load(open("/tmp/forge2-models.json"))
+expect = sys.argv[1:3]
+ids = [m.get("id", "") for m in data.get("data", [])]
+print("Available models:", ", ".join(ids) if ids else "(none)")
+missing = [m for m in expect if not any(m == i or m in i or i in m for i in ids)]
+if missing:
+    print("FAIL — not found in /v1/models:", ", ".join(missing))
+    sys.exit(1)
+print("OK — both model IDs present")
+PY
+
+test_completion() {
+  local label="$1"
+  local model="$2"
+  echo ""
+  echo "==> Completion test: $label ($model)"
+  HTTP=$(curl -s -o /tmp/forge2-completion.json -w "%{http_code}" \
+    "$BASE_URL/chat/completions" \
+    -H "Content-Type: application/json" \
+    -d "{\"model\":\"$model\",\"messages\":[{\"role\":\"user\",\"content\":\"Reply with exactly: OK\"}],\"max_tokens\":16,\"temperature\":0}" \
+    || true)
+
+  if [ "$HTTP" != "200" ]; then
+    echo "FAIL (HTTP $HTTP)"
+    head -c 400 /tmp/forge2-completion.json 2>/dev/null
+    echo ""
     return 1
   fi
 
-  if command -v python3 >/dev/null 2>&1; then
-    python3 - <<'PY' "$expect_model"
-import json, sys
-data = json.load(open("/tmp/forge2-models.json"))
-expect = sys.argv[1]
-ids = [m.get("id", "") for m in data.get("data", data if isinstance(data, list) else [])]
-if not ids and "models" in data:
-    ids = [m.get("id", "") for m in data["models"]]
-print("Models loaded:", ", ".join(ids) if ids else "(none listed)")
-if ids and not any(expect in i or i in expect for i in ids):
-    print(f"WARN — expected '{expect}' not in server model list")
+  python3 - <<'PY'
+import json
+r = json.load(open("/tmp/forge2-completion.json"))
+text = r.get("choices", [{}])[0].get("message", {}).get("content", "")
+print("Response:", text.strip()[:120] or "(empty)")
 PY
-  else
-    head -c 300 /tmp/forge2-models.json
-    echo ""
-  fi
   echo "OK"
-  echo ""
 }
 
 FAIL=0
-check_server "Hermes (LFM2.5-Thinking)" "$HERMES_URL" "$HERMES_MODEL" || FAIL=1
-check_server "OpenClaw (LFM2-Tool)" "$OPENCLAW_URL" "$OPENCLAW_MODEL" || FAIL=1
+test_completion "Hermes brain" "$HERMES_MODEL" || FAIL=1
+test_completion "OpenClaw hands" "$OPENCLAW_MODEL" || FAIL=1
 
 if [ "$FAIL" -eq 0 ]; then
-  echo "Both LM Studio servers reachable."
+  echo ""
+  echo "All model checks passed."
   exit 0
 fi
 
-echo "Fix: load the correct GGUF in each LM Studio instance (see MODEL_STACK.md)."
+echo ""
+echo "Fix: ensure both MLX models are loaded in LM Studio and Local Server is on port 1234."
 exit 1

@@ -1,11 +1,11 @@
 {
-  "_comment": "OpenClaw (hands/coder) config. LFM2-Tool Q4 on LM Studio :1235. Brain (LFM2.5-Thinking) runs on :1234.",
+  "_comment": "OpenClaw (hands/coder). liquid/lfm2.5-1.2b MLX 8-bit on LM Studio :1234. Brain: lfm2.5-1.2b-thinking-mlx on same server.",
   "agents": {
     "defaults": {
       "workspace": "<repo-root>",
-      "model": { "primary": "lmstudio/liquid/lfm2-1.2b-tool" },
+      "model": { "primary": "lmstudio/liquid/lfm2.5-1.2b" },
       "models": {
-        "lmstudio/liquid/lfm2-1.2b-tool": {}
+        "lmstudio/liquid/lfm2.5-1.2b": {}
       }
     }
   },
@@ -31,14 +31,20 @@
     "mode": "merge",
     "providers": {
       "lmstudio": {
-        "baseUrl": "http://localhost:1235/v1",
+        "baseUrl": "http://localhost:1234/v1",
         "apiKey": "lm-studio",
         "api": "openai-completions",
         "contextWindow": 32768,
         "models": [
           {
-            "id": "liquid/lfm2-1.2b-tool",
-            "name": "LFM2 1.2B Tool (Q4)",
+            "id": "liquid/lfm2.5-1.2b",
+            "name": "LFM2.5 1.2B Instruct (MLX 8-bit)",
+            "api": "openai-completions",
+            "input": ["text"]
+          },
+          {
+            "id": "lfm2.5-1.2b-thinking-mlx",
+            "name": "LFM2.5 1.2B Thinking (MLX 4-bit)",
             "api": "openai-completions",
             "input": ["text"]
           }

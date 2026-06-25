@@ -4,8 +4,8 @@
 
 ```mermaid
 flowchart LR
-    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>LFM2.5-Thinking Q4"]
-    B -->|plan + task| C["OpenClaw - Hands<br/>LFM2-Tool Q4"]
+    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>thinking-mlx 4-bit"]
+    B -->|plan + task| C["OpenClaw - Hands<br/>lfm2.5-1.2b 8-bit"]
     C -->|writes & runs code| Repo[("Repo: backend + frontend")]
     C -->|What I Did / What's Left / What Needs Your Call| H
     B -. "memory + skill + cron" .-> Log["#agent_log"]
@@ -28,15 +28,10 @@ flowchart LR
 
 | Agent | Model | HF source | Endpoint |
 |-------|-------|-----------|----------|
-| Hermes (planning) | `liquid/lfm2.5-1.2b-thinking` | [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) @ Q4_K_M | LM Studio `:1234/v1` |
-| OpenClaw (coding) | `liquid/lfm2-1.2b-tool` | [LFM2-Tool-GGUF](https://huggingface.co/LiquidAI/LFM2-1.2B-Tool-GGUF) @ Q4_K_M | LM Studio `:1235/v1` |
+| Hermes (planning) | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit | LM Studio `:1234/v1` |
+| OpenClaw (coding) | `liquid/lfm2.5-1.2b` | MLX 8-bit | LM Studio `:1234/v1` |
 
-**Why this split:**
-
-- **Planning is reasoning-heavy** — LFM2.5-Thinking decomposes goals and sequences work.
-- **Execution is tool-heavy** — LFM2-Tool is purpose-built for concise tool/API/shell calls.
-- **Unified Liquid stack** — same vendor, same VRAM footprint (~731 MB each at Q4).
-- **Dual ports** — brain and hands run at the same time without swapping models.
+**Why this split:** Thinking MLX decomposes goals; Instruct MLX executes tool calls. Single LM Studio server — both model IDs registered, routed per request.
 
 Full rationale and rejected alternatives: [`MODEL_STACK.md`](MODEL_STACK.md).
 
@@ -62,8 +57,8 @@ See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser dem
 
 ## Config files (secrets removed)
 
-- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2-1.2b-tool` @ `:1235`
-- `hermes-config.yaml` — Hermes; `liquid/lfm2.5-1.2b-thinking` @ `:1234` + memory + cron
+- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b` @ `:1234`
+- `hermes-config.yaml` — Hermes; `lfm2.5-1.2b-thinking-mlx` @ `:1234`
 - `MODEL_STACK.md` — open-source model selection and migration notes
 - `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5`
 - `.env.example` — Slack + LM Studio vars (no paid keys)

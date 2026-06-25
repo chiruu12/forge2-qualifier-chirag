@@ -1,13 +1,12 @@
 # Hermes (brain/orchestrator) config — excerpt of ~/.hermes/config.yaml
-# Open-source stack: LFM2.5-Thinking Q4 via LM Studio (HuggingFace GGUF).
+# Open-source stack: LFM2.5-Thinking MLX 4-bit via LM Studio.
 #
-# Download (4-bit only, VRAM-friendly):
-#   LiquidAI/LFM2.5-1.2B-Thinking-GGUF @ Q4_K_M
-# Load in LM Studio → Local Server on port 1234.
+# LM Studio model ID: lfm2.5-1.2b-thinking-mlx
+# Local Server port 1234 (shared with OpenClaw — routed by model ID).
 # See MODEL_STACK.md
 
 model:
-  default: liquid/lfm2.5-1.2b-thinking
+  default: lfm2.5-1.2b-thinking-mlx
   provider: custom
   base_url: http://localhost:1234/v1
   max_tokens: 4096
@@ -17,21 +16,14 @@ model:
 toolsets:
   - hermes-cli
 
-# --- Memory (cross-session) ---
-# Hermes persists facts to ~/.hermes/memory/ (project name, branch, model routing).
-# Demonstrated in agent-log.md § Memory recall (Session A save → Session B recall).
 memory:
   enabled: true
   store_path: ~/.hermes/memory/
 
-# --- Skills ---
-# status-report skill lives in repo: skills/status-report/SKILL.md
 skills:
   paths:
     - ./skills
 
-# --- Autonomous run (cron) ---
-# Posts a one-line progress update to #agent_log every 30 minutes with no human prompt.
 cron:
   - name: forge2-heartbeat
     schedule: "*/30 * * * *"

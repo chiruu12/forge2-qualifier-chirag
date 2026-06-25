@@ -12,11 +12,12 @@ Browser → Vercel (React) → ngrok HTTPS URL → localhost:8000 (Laravel + SQL
 
 ### 1. Start LM Studio (agents — optional for judging Kanban only)
 
-Two instances (or two server profiles), **Q4_K_M only**:
+Load in LM Studio (MLX):
 
-1. **Port 1234 — Hermes brain:** [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF)
-2. **Port 1235 — OpenClaw hands:** [LFM2-Tool-GGUF](https://huggingface.co/LiquidAI/LFM2-1.2B-Tool-GGUF)
-3. Verify: `./scripts/verify-models.sh`
+1. `lfm2.5-1.2b-thinking-mlx` (4-bit) — Hermes brain
+2. `liquid/lfm2.5-1.2b` (8-bit) — OpenClaw hands
+3. Local Server on port **1234**
+4. Verify: `./scripts/verify-models.sh`
 
 See [`MODEL_STACK.md`](MODEL_STACK.md) for download links and why closed APIs (e.g. Sakana Fugu) were not used.
 

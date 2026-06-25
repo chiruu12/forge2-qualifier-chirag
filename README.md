@@ -2,8 +2,8 @@
 
 A Trello-style Kanban board built with a **human-in-the-loop two-agent Slack loop**, running entirely on **open-weight models** from Hugging Face (4-bit local inference).
 
-- **Brain (Hermes):** plans, remembers, runs skills, posts on a schedule — **LFM2.5-Thinking** Q4 via LM Studio (`:1234`).
-- **Hands (OpenClaw):** writes and runs code, reports back — **LFM2-Tool** Q4 via LM Studio (`:1235`).
+- **Brain (Hermes):** `lfm2.5-1.2b-thinking-mlx` (4-bit MLX) — plans, memory, skills, cron
+- **Hands (OpenClaw):** `liquid/lfm2.5-1.2b` (8-bit MLX) — writes and runs code
 - **You:** post goals, approve plans, review output — all in Slack.
 
 See [`MODEL_STACK.md`](MODEL_STACK.md) for why we migrated off paid/closed APIs (including Sakana Fugu) and how models were chosen.
@@ -20,10 +20,10 @@ Kanban: **Boards → Lists → Cards**, with tags, members, due dates, drag-and-
 
 | Role | Model | Source | Endpoint |
 |------|-------|--------|----------|
-| **Brain** (Hermes) | `liquid/lfm2.5-1.2b-thinking` | [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) @ Q4_K_M | LM Studio `http://localhost:1234/v1` |
-| **Hands** (OpenClaw) | `liquid/lfm2-1.2b-tool` | [LFM2-Tool-GGUF](https://huggingface.co/LiquidAI/LFM2-1.2B-Tool-GGUF) @ Q4_K_M | LM Studio `http://localhost:1235/v1` |
+| **Brain** (Hermes) | `lfm2.5-1.2b-thinking-mlx` | LFM2.5-Thinking MLX 4-bit | `http://localhost:1234/v1` |
+| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b` | LFM2.5-Instruct MLX 8-bit | `http://localhost:1234/v1` |
 
-**Why this split:** LFM2.5-Thinking decomposes goals; LFM2-Tool executes tool calls and file edits. Both are **open Liquid AI weights**, local, and 4-bit quantized (~731 MB each). Two LM Studio ports let brain and hands run simultaneously.
+Both models on **one LM Studio server** (port 1234), routed by model ID.
 
 ## Live URL
 
@@ -33,13 +33,11 @@ Kanban: **Boards → Lists → Cards**, with tags, members, due dates, drag-and-
 
 ## Run locally
 
-### Agents (LM Studio — two ports)
+### Agents (LM Studio MLX)
 
-1. Download both GGUF models from HuggingFace (**Q4_K_M only**). Details: [`MODEL_STACK.md`](MODEL_STACK.md).
-2. **Port 1234:** load **LFM2.5-Thinking** → Hermes brain.
-3. **Port 1235:** load **LFM2-Tool** → OpenClaw hands.
-4. Enable Local Server on each instance.
-5. Verify: `./scripts/verify-models.sh`
+1. Load both models in LM Studio (see [`MODEL_STACK.md`](MODEL_STACK.md)).
+2. Enable **Local Server** on port **1234**.
+3. Verify: `./scripts/verify-models.sh` or `./scripts/verify-all.sh`
 
 ### Backend
 
@@ -84,15 +82,15 @@ Raw Slack transcripts and screenshots: [`agent-log.md`](agent-log.md), [`docs/`]
 backend/           Laravel API + SQLite
 frontend/          React UI (Vercel)
 skills/            Hermes skills (status-report)
-scripts/           start-live-demo.sh, verify-api.sh, verify-models.sh
+scripts/           verify-models.sh, verify-all.sh, verify-api.sh, start-live-demo.sh
 docs/              Evidence screenshots
 agent-log.md       Unedited agent loop log (Kanban build + HITL + memory + skill)
 BUILD_CHRONOLOGY.md Slack goals mapped to git commits and files
 ARCHITECTURE.md    System design
 MODEL_STACK.md     Open-source Liquid AI model choices (Thinking + Tool)
 DEPLOYMENT.md      ngrok + Vercel live demo
-openclaw.json      OpenClaw config (LFM2-Tool @ :1235)
-hermes-config.yaml Hermes config (LFM2.5-Thinking @ :1234 + memory + cron)
+openclaw.json      OpenClaw config (liquid/lfm2.5-1.2b @ :1234)
+hermes-config.yaml Hermes config (lfm2.5-1.2b-thinking-mlx @ :1234)
 .env.example       Env template (no paid keys)
 ```
 
@@ -101,8 +99,8 @@ hermes-config.yaml Hermes config (LFM2.5-Thinking @ :1234 + memory + cron)
 Every phase of the Kanban app went through the **Slack two-agent loop**:
 
 1. You posted a goal in `#sprint_main`
-2. **Hermes** (LFM2.5-Thinking) decomposed it and waited for your approval
-3. **OpenClaw** (LFM2-Tool) wrote and ran the code in `#agent_coder`
+2. **Hermes** (`lfm2.5-1.2b-thinking-mlx`) decomposed it and waited for your approval
+3. **OpenClaw** (`liquid/lfm2.5-1.2b`) wrote and ran the code in `#agent_coder`
 4. You reviewed output before the next phase
 
 The full build chronology — Laravel API, React UI, theme polish, demo mode, ngrok — with Slack transcripts mapped to git commits is in [`agent-log.md`](agent-log.md) § Kanban build sprint.
