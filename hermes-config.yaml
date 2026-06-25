@@ -1,17 +1,38 @@
-# Hermes (brain/orchestrator) config - relevant excerpt of ~/.hermes/config.yaml.
-# Secret removed: api_key is the real Fireworks key locally; here it's an env placeholder.
-# Brain = Kimi 2.6 on Fireworks, reached via the OpenAI-compatible "custom" provider.
+# Hermes (brain/orchestrator) config — excerpt of ~/.hermes/config.yaml
+# Free stack: LFM2.5-Thinking Q4 via LM Studio (HuggingFace GGUF, no paid API keys).
+#
+# Download (4-bit only, VRAM-friendly):
+#   LiquidAI/LFM2.5-1.2B-Thinking-GGUF @ Q4_K_M
+# Load in LM Studio → Local Server on port 1234.
 
 model:
-  default: accounts/fireworks/models/kimi-k2p6
+  default: liquid/lfm2.5-1.2b-thinking
   provider: custom
-  base_url: https://api.fireworks.ai/inference/v1
-  max_tokens: 8192          # Fireworks/Kimi output cap
-  context_length: 131072
-  api_key: ${FIREWORKS_API_KEY}   # REMOVED - set locally in ~/.hermes/.env
+  base_url: http://localhost:1234/v1
+  max_tokens: 4096
+  context_length: 32768
+  api_key: lm-studio
 
 toolsets:
   - hermes-cli
 
-# Memory (cross-session), the status-report skill, and a cron autonomous run
-# are all enabled and demonstrated in agent-log.md.
+# --- Memory (cross-session) ---
+# Hermes persists facts to ~/.hermes/memory/ (project name, branch, model routing).
+# Demonstrated in agent-log.md § Memory recall (Session A save → Session B recall).
+memory:
+  enabled: true
+  store_path: ~/.hermes/memory/
+
+# --- Skills ---
+# status-report skill lives in repo: skills/status-report/SKILL.md
+skills:
+  paths:
+    - ./skills
+
+# --- Autonomous run (cron) ---
+# Posts a one-line progress update to #agent_log every 30 minutes with no human prompt.
+cron:
+  - name: forge2-heartbeat
+    schedule: "*/30 * * * *"
+    channel: ${CH_AGENT_LOG}
+    prompt: "Post a one-line Forge 2 progress update using the status-report skill format."
