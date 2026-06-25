@@ -4,27 +4,23 @@
 
 | Service | Port | URL |
 |---------|------|-----|
-| **LM Studio** (agents) | **7900** | `http://localhost:7900/v1` |
-| **Laravel API** (Kanban) | **7901** | `http://localhost:7901/api` |
+| **LM Studio** (agents) | **1234** | `http://127.0.0.1:1234/v1` |
+| **Laravel API** (Kanban) | **7900** | `http://localhost:7900/api` |
 
-Set LM Studio → **Settings → Local Server → Port 7900**.
+LM Studio keeps its default port **1234**. Our Laravel server runs on **7900**.
 
 ## Active models
 
-| Role | Agent | LM Studio model ID | Quantization |
-|------|-------|-------------------|--------------|
-| **Brain** | Hermes | `lfm2.5-1.2b-thinking-mlx` | 4-bit MLX |
-| **Hands** | OpenClaw | `liquid/lfm2.5-1.2b` | 8-bit MLX |
-
-Both models on one LM Studio server (port **7900**), routed by model ID.
+| Role | Agent | LM Studio model ID |
+|------|-------|-------------------|
+| **Brain** | Hermes | `lfm2.5-1.2b-thinking-mlx` |
+| **Hands** | OpenClaw | `liquid/lfm2.5-1.2b` |
 
 ## Validate
 
 ```bash
-./scripts/verify-models.sh    # LM Studio :7900
-./scripts/start-live-demo.sh  # Laravel :7901
+./scripts/verify-models.sh    # LM Studio :1234
+./scripts/start-live-demo.sh  # Laravel :7900
 ./scripts/verify-all.sh       # both
-ngrok http 7901               # live demo tunnel
+ngrok http 7900               # live demo tunnel
 ```
-
-Override ports: `LMSTUDIO_PORT=7900 LARAVEL_PORT=7901 ./scripts/verify-all.sh`

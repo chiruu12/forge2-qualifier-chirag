@@ -20,10 +20,10 @@ Kanban: **Boards → Lists → Cards**, with tags, members, due dates, drag-and-
 
 | Role | Model | Source | Endpoint |
 |------|-------|--------|----------|
-| **Brain** (Hermes) | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit | `http://localhost:7900/v1` |
-| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b` | MLX 8-bit | `http://localhost:7900/v1` |
+| **Brain** (Hermes) | `lfm2.5-1.2b-thinking-mlx` | MLX 4-bit | `http://127.0.0.1:1234/v1` |
+| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b` | MLX 8-bit | `http://127.0.0.1:1234/v1` |
 
-Both on LM Studio port **7900**. Laravel API on port **7901**.
+LM Studio on **1234**. Laravel API on **7900**.
 
 ## Live URL
 
@@ -36,7 +36,7 @@ Both on LM Studio port **7900**. Laravel API on port **7901**.
 ### Agents (LM Studio MLX)
 
 1. Load both models in LM Studio (see [`MODEL_STACK.md`](MODEL_STACK.md)).
-2. LM Studio → Local Server on port **7900**.
+2. LM Studio Local Server stays on **1234** (`http://127.0.0.1:1234`).
 3. Verify: `./scripts/verify-models.sh`
 
 ### Backend
@@ -46,7 +46,7 @@ cd backend
 composer install
 cp .env.example .env && php artisan key:generate
 php artisan migrate:fresh --seed
-php artisan serve --host=0.0.0.0 --port=7901
+php artisan serve --host=0.0.0.0 --port=7900
 ```
 
 ### Frontend
@@ -54,7 +54,7 @@ php artisan serve --host=0.0.0.0 --port=7901
 ```bash
 cd frontend
 npm install
-echo "VITE_API_URL=http://localhost:7901/api" > .env
+echo "VITE_API_URL=http://localhost:7900/api" > .env
 npm run dev
 ```
 
@@ -62,7 +62,7 @@ npm run dev
 
 ```bash
 ./scripts/start-live-demo.sh    # terminal 1
-ngrok http 7901                 # terminal 2 → update Vercel VITE_API_URL
+ngrok http 7900                 # terminal 2 → update Vercel VITE_API_URL
 ```
 
 ## Human-in-the-loop, memory, skill
@@ -89,8 +89,8 @@ BUILD_CHRONOLOGY.md Slack goals mapped to git commits and files
 ARCHITECTURE.md    System design
 MODEL_STACK.md     Open-source Liquid AI model choices (Thinking + Tool)
 DEPLOYMENT.md      ngrok + Vercel live demo
-openclaw.json      OpenClaw config (liquid/lfm2.5-1.2b @ :7900)
-hermes-config.yaml Hermes config (lfm2.5-1.2b-thinking-mlx @ :7900)
+openclaw.json      OpenClaw config (liquid/lfm2.5-1.2b @ 127.0.0.1:1234)
+hermes-config.yaml Hermes config (lfm2.5-1.2b-thinking-mlx @ 127.0.0.1:1234)
 .env.example       Env template (no paid keys)
 ```
 

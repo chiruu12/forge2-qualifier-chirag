@@ -2,13 +2,13 @@
 # Open-source stack: LFM2.5-Thinking MLX 4-bit via LM Studio.
 #
 # LM Studio model ID: lfm2.5-1.2b-thinking-mlx
-# Local Server port 7900 (shared with OpenClaw — routed by model ID).
+# Local Server port 1234 (LM Studio default — shared with OpenClaw, routed by model ID).
 # See MODEL_STACK.md
 
 model:
   default: lfm2.5-1.2b-thinking-mlx
   provider: custom
-  base_url: http://localhost:7900/v1
+  base_url: http://127.0.0.1:1234/v1
   max_tokens: 4096
   context_length: 32768
   api_key: lm-studio

@@ -28,5 +28,5 @@ git commit:    Phase lands in repo
 
 ```bash
 git log --oneline -- backend/ frontend/
-curl -s http://localhost:7901/api/boards | python3 -m json.tool | head
+curl -s http://localhost:7900/api/boards | python3 -m json.tool | head
 ```
