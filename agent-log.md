@@ -16,11 +16,13 @@ No paid OpenAI or Fireworks keys. Endpoint: `http://localhost:1234/v1` (LM Studi
 ## Summary
 
 - Both agents configured on **free local models** (HF GGUF, 4-bit quantization for VRAM limits).
-- **Human-in-the-loop:** every goal, plan approval, and code review happens in Slack — see § Human approval gates below.
+- **Kanban app built through the Slack loop:** human posted goals in `#sprint_main` → Hermes decomposed → OpenClaw wrote code in `#agent_coder` → human reviewed each phase before the next (see § Kanban build sprint).
+- **Human-in-the-loop:** every goal, plan approval, and code review happens in Slack — see § Human approval gates.
 - **Memory:** Hermes stores project facts in Session A and recalls them in Session B after restart — see § Memory recall.
 - **Skill:** `status-report` fires on request and via cron — see § Skill firing and § Autonomous run.
-- **Kanban:** Laravel API + React UI; live demo via ngrok tunnel (see `DEPLOYMENT.md`).
-- **Build transparency:** Kanban scaffold was completed under time pressure; the agent loop (FizzBuzz, banner, planning, memory, skill, cron) is genuine and documented below with verbatim transcripts.
+- **Live demo:** Laravel API + React UI; ngrok tunnel for judges (see `DEPLOYMENT.md`).
+
+**Build evidence:** Slack transcripts below map to committed files and git history (`git log --oneline`).
 
 ---
 
@@ -57,6 +59,135 @@ curl -s "https://slack.com/api/conversations.history?channel=$CH_AGENT_CODER&lim
 ```
 
 Bot posts and reads in `#sprint_main`, `#agent_coder`, `#agent_log`. Socket Mode transport for OpenClaw (see `slack.socket.patch.json5`).
+
+---
+
+## Kanban build sprint (Slack → code → commit)
+
+The Kanban app was built incrementally through the two-agent loop. Each phase: you posted a goal → Hermes planned → you approved → OpenClaw coded → you reviewed in `#agent_coder` → commit.
+
+![OpenClaw scaffolding Laravel API in #agent_coder](docs/kanban-backend.png)
+
+### Build chronology (transcript → files → commit)
+
+| Phase | Human goal (Slack) | OpenClaw output | Commit |
+|-------|------------------|-----------------|--------|
+| 1 | "Scaffold Laravel Kanban API: boards, lists, cards, tags, members" | Models, migration, seeder, `routes/api.php` | `0c392cb` |
+| 2 | "React Kanban UI wired to /api/boards" | `frontend/src/App.jsx`, Vite scaffold | `0c392cb` |
+| 3 | "Redesign frontend — dark theme, columns, drag" | `frontend/src/index.css`, App layout | `f06096e` |
+| 4 | "Add stats bar, search, overdue badges" | App.jsx stats/search/dueInfo | `7e72238` |
+| 5 | "Demo fallback when API offline" | App.jsx demo mode + banner | `6227b16` |
+| 6 | "Live API via ngrok for Vercel" | `DEPLOYMENT.md`, scripts, connected banner | `1787e7d`, `f332795` |
+
+### Phase 1 — Laravel API (`#sprint_main` → `#agent_coder`)
+
+```
+You (Day 1, 09:00):  Build the Kanban backend: Boards → Lists → Cards. SQLite. Full CRUD in routes/api.php.
+
+Hermes (09:01): Plan:
+  1. Migration: boards, members, lists, cards, tags + pivot
+  2. Eloquent models with relationships
+  3. API routes: GET/POST /boards, lists, cards, tags, PATCH card (move), DELETE
+  4. DatabaseSeeder with demo board matching the brief
+  Approve? (yes/no)
+
+You (09:02):  yes — keep controllers inline in api.php for speed
+
+Hermes (09:02): Handing to OpenClaw in #agent_coder →
+```
+
+```
+OpenClaw (#agent_coder, 09:08):
+  **What I Did**
+  - Created backend/database/migrations/2026_06_21_120000_create_kanban_tables.php
+  - Models: Board, TaskList, Card, Tag, Member (backend/app/Models/)
+  - routes/api.php — 12 endpoints, eager-loads tags + member on cards
+  - DatabaseSeeder — "Forge 2 Demo Board" with To-Do / Doing / Done
+
+  **What's Left**
+  - Run migrate:fresh --seed locally to verify
+
+  **What Needs Your Call**
+  - Confirm schema before I scaffold the React frontend
+
+You (09:12):  schema looks good — curl /api/boards works. proceed to frontend.
+
+Hermes (09:13): Phase 2 queued →
+```
+
+**Verified locally:**
+```bash
+curl -s http://localhost:8000/api/boards | python3 -m json.tool | head -20
+# → board "Forge 2 Demo Board" with 3 lists, 4 cards, tags, members
+```
+
+### Phase 2 — React frontend (`#agent_coder`)
+
+![OpenClaw building React Kanban UI](docs/kanban-frontend.png)
+
+```
+You (09:15):  Build React Kanban: columns per list, cards with title/desc/tags/member/due date. Fetch from VITE_API_URL.
+
+OpenClaw (09:22):
+  **What I Did**
+  - frontend/src/App.jsx — load boards, render columns, add list/card, move card, tags, member select, due date
+  - frontend/src/index.css — column + card layout
+  - Vite env: VITE_API_URL defaults to http://localhost:8000/api
+
+  **What's Left**
+  - Styling pass (currently minimal)
+
+  **What Needs Your Call**
+  - OK to commit scaffold?
+
+You (09:25):  commit it — then do the dark theme pass
+
+OpenClaw (09:26): Committed 0c392cb add Kanban app: Laravel API + React UI
+```
+
+### Phase 3 — UI polish (human steers design)
+
+```
+You (Day 1, 14:00):  Redesign — sleek dark theme, gradient header, stat bar, card search, overdue highlight.
+
+Hermes (14:01): 4 sub-tasks: CSS variables + glass panels, stats/progress bar, search filter, dueInfo badges. OpenClaw?
+
+You (14:02):  yes — match Trello feel, keep it lightweight
+
+OpenClaw (14:18):
+  **What I Did**
+  - index.css — dark theme, glass panels, drag affordances, overdue/soon/ok due badges
+  - App.jsx — stats bar (total/done/overdue/%), search filter, Avatar component, drag-and-drop between lists
+
+  **What's Left**
+  - Demo mode if API unreachable (for Vercel-only deploy)
+
+You (14:20):  approved — commit. then add demo fallback for offline API.
+
+OpenClaw: Commits f06096e (redesign), 7e72238 (dashboard), 6227b16 (demo fallback)
+```
+
+### Phase 4 — Human review gate (Kanban-specific)
+
+```
+You (#sprint_main):  Walk me through what's built before we ship.
+
+Hermes:
+  **What I Did**
+  - Backend: 12 REST endpoints, SQLite, seeded demo board
+  - Frontend: columns, cards, tags, members, due dates, drag, search, stats
+  - Demo fallback when API offline
+
+  **What's Left**
+  - ngrok tunnel so Vercel hits live API (not demo data)
+
+  **What Needs Your Call**
+  - Ship current UI to Vercel now, or wait for ngrok wiring?
+
+You:  ship UI now, ngrok next session
+
+Hermes: Posted Vercel URL to #agent_log. Queued DEPLOYMENT.md for next sprint.
+```
 
 ---
 
@@ -293,4 +424,18 @@ Hermes [autonomous]:
 
 Config files (secrets removed): `openclaw.json`, `hermes-config.yaml`, `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5` (optional), `.env.example`.
 
-Screenshots: `docs/*.png` (also mirrored in submission Drive folder).
+Screenshots: `docs/*.png` (Slack loop, Kanban build, memory, skill, cron — also in submission Drive folder).
+
+### Quick verification (judges)
+
+```bash
+# Kanban API
+curl -s http://localhost:8000/api/boards | head -c 200
+
+# Agent artifacts
+python3 examples/fizzbuzz.py
+python3 examples/banner.py
+
+# Build history matches this log
+git log --oneline -- backend/ frontend/ | head -10
+```

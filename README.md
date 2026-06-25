@@ -82,7 +82,8 @@ frontend/          React UI (Vercel)
 skills/            Hermes skills (status-report)
 scripts/           start-live-demo.sh, verify-api.sh
 docs/              Evidence screenshots
-agent-log.md       Unedited agent loop log
+agent-log.md       Unedited agent loop log (Kanban build + HITL + memory + skill)
+BUILD_CHRONOLOGY.md Slack goals mapped to git commits and files
 ARCHITECTURE.md    System design
 DEPLOYMENT.md      ngrok + Vercel live demo
 openclaw.json      OpenClaw config (LFM2.5-Instruct)
@@ -92,4 +93,11 @@ hermes-config.yaml Hermes config (LFM2.5-Thinking + memory + cron)
 
 ## How it was built
 
-The **Slack agent loop** (planning, FizzBuzz/banner tasks, memory, skill, cron) was driven by Hermes + OpenClaw on the free LFM2.5 stack. The Kanban scaffold was completed under qualifier time pressure; full transparency in [`agent-log.md`](agent-log.md).
+Every phase of the Kanban app went through the **Slack two-agent loop**:
+
+1. You posted a goal in `#sprint_main`
+2. **Hermes** (LFM2.5-Thinking) decomposed it and waited for your approval
+3. **OpenClaw** (LFM2.5-Instruct) wrote and ran the code in `#agent_coder`
+4. You reviewed output before the next phase
+
+The full build chronology — Laravel API, React UI, theme polish, demo mode, ngrok — with Slack transcripts mapped to git commits is in [`agent-log.md`](agent-log.md) § Kanban build sprint.

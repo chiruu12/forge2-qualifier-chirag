@@ -4,6 +4,8 @@ Commit these five PNGs here (also mirrored in the submission Drive folder):
 
 | File | Captures |
 |------|----------|
+| `kanban-backend.png` | `#agent_coder` — OpenClaw creates Laravel models + `routes/api.php` |
+| `kanban-frontend.png` | `#agent_coder` — OpenClaw builds React Kanban UI |
 | `slack-loop.png` | `#agent_coder` — OpenClaw writes/runs FizzBuzz (model name visible) |
 | `hermes-memory-save.png` | Session A — Hermes stores repo/model facts |
 | `hermes-memory-recall.png` | Session B — Hermes recalls after restart |

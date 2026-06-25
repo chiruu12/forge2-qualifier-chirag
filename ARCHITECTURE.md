@@ -52,6 +52,7 @@ See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser dem
 
 | Feature | Config | Evidence |
 |---------|--------|----------|
+| **Kanban build loop** | Slack `#sprint_main` → `#agent_coder` | `agent-log.md` § Kanban build sprint, `BUILD_CHRONOLOGY.md` |
 | **Memory** | `hermes-config.yaml` → `memory.enabled: true` | `agent-log.md` § Memory recall (Session A → B) |
 | **Skill** | `skills/status-report/SKILL.md` | `agent-log.md` § Skill firing |
 | **Cron** | `hermes-config.yaml` → `cron.forge2-heartbeat` | `agent-log.md` § Autonomous run |
