@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+const API_LABEL = API.replace(/^https?:\/\//, '').replace(/\/api$/, '')
 
 const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
 function dueInfo(due) {
@@ -47,6 +48,7 @@ const COL_COLORS = ['#64748b', '#7c8cff', '#22d3ee', '#34d399', '#f59e0b', '#f47
 export default function App() {
   const [board, setBoard] = useState(null)
   const [demo, setDemo] = useState(false)
+  const [apiOk, setApiOk] = useState(false)
   const [newList, setNewList] = useState('')
   const [q, setQ] = useState('')
   const [dragId, setDragId] = useState(null)
@@ -57,8 +59,8 @@ export default function App() {
       const res = await fetch(`${API}/boards`)
       if (!res.ok) throw new Error('http ' + res.status)
       const boards = await res.json()
-      setBoard(boards[0] || demoBoard()); setDemo(false)
-    } catch { setBoard(demoBoard()); setDemo(true) }
+      setBoard(boards[0] || demoBoard()); setDemo(false); setApiOk(true)
+    } catch { setBoard(demoBoard()); setDemo(true); setApiOk(false) }
   }
   useEffect(() => { load() }, [])
 
@@ -94,10 +96,15 @@ export default function App() {
 
   return (
     <div className="wrap">
+      {apiOk && !demo && (
+        <div className="banner connected">
+          ✓ <b>Live API connected.</b> Board data from Laravel via <code>{API_LABEL}</code> — create, move, and tag cards; changes persist in SQLite.
+        </div>
+      )}
       {demo && (
         <div className="banner">
-          🧩 <b>Frontend demo.</b> Running on sample data in your browser (no backend connected); this is the React UI only.
-          For the full app with the Laravel API and saved data, clone the repo and run it locally (see the <b>README</b>).
+          🧩 <b>Frontend demo.</b> No reachable API at <code>{API}</code> — showing sample data in your browser only.
+          Start Laravel + ngrok and set <code>VITE_API_URL</code> (see <b>DEPLOYMENT.md</b>).
         </div>
       )}
 
