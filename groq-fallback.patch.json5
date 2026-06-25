@@ -1,4 +1,4 @@
-// Optional free fallback for Hermes brain when LM Studio is unavailable.
+// Optional cloud fallback — NOT part of the open-source local stack.
 // Groq free tier: openai/gpt-oss-120b @ https://api.groq.com/openai/v1
 {
   models: {

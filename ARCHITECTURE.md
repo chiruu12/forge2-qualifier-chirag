@@ -4,7 +4,7 @@
 
 ```mermaid
 flowchart LR
-    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>LFM2.5-Thinking Q4"]
+    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>Phi-4-mini-reasoning Q4"]
     B -->|plan + task| C["OpenClaw - Hands<br/>LFM2.5-Instruct Q4"]
     C -->|writes & runs code| Repo[("Repo: backend + frontend")]
     C -->|What I Did / What's Left / What Needs Your Call| H
@@ -24,21 +24,23 @@ flowchart LR
 | `#agent_coder` | Coding tasks for OpenClaw; code + stdout posted here. |
 | `#agent_log` | Cron heartbeat + audit trail. |
 
-## Model routing (free stack)
+## Model routing (open-source stack)
 
 | Agent | Model | HF source | Endpoint |
 |-------|-------|-----------|----------|
-| Hermes (planning) | `liquid/lfm2.5-1.2b-thinking` | [Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) @ Q4_K_M | LM Studio `:1234/v1` |
-| OpenClaw (coding) | `liquid/lfm2.5-1.2b-instruct` | [Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) @ Q4_K_M | LM Studio `:1234/v1` |
+| Hermes (planning) | `phi-4-mini-reasoning` | [Phi-4-mini-reasoning-GGUF](https://huggingface.co/unsloth/Phi-4-mini-reasoning-GGUF) @ Q4_K_M (MIT) | LM Studio `:1234/v1` |
+| OpenClaw (coding) | `liquid/lfm2.5-1.2b-instruct` | [Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) @ Q4_K_M | LM Studio `:1235/v1` |
 
 **Why this split:**
 
-- **Planning is reasoning-heavy** — LFM2.5-Thinking decomposes goals and sequences work.
-- **Execution is tool-heavy** — LFM2.5-Instruct handles file edits and command runs.
-- **Both are free** — HuggingFace GGUF, local inference, 4-bit only (VRAM constraint).
-- **No paid APIs** — replaces prior OpenAI + Fireworks stack that scored 0 on free-stack.
+- **Planning is reasoning-heavy** — Phi-4-mini-reasoning (3.8B, MIT) is the strongest small open reasoning model we evaluated; Sakana Fugu was rejected as closed-source.
+- **Execution is tool-heavy** — LFM2.5-Instruct (1.2B) is fast and VRAM-light for file edits and command runs.
+- **Both are open weights** — HuggingFace GGUF, local inference, 4-bit only (VRAM constraint).
+- **Dual ports** — brain and hands run at the same time without swapping models.
 
-**Optional fallback:** Groq `openai/gpt-oss-120b` free tier via `groq-fallback.patch.json5` if local VRAM is insufficient.
+Full rationale and rejected alternatives: [`MODEL_STACK.md`](MODEL_STACK.md).
+
+**Optional cloud fallback:** Groq free tier via `groq-fallback.patch.json5` — not part of the open-source stack.
 
 ## Live deployment
 
@@ -60,7 +62,8 @@ See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser dem
 
 ## Config files (secrets removed)
 
-- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b-instruct`
-- `hermes-config.yaml` — Hermes; `liquid/lfm2.5-1.2b-thinking` + memory + cron
+- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b-instruct` @ `:1235`
+- `hermes-config.yaml` — Hermes; `phi-4-mini-reasoning` @ `:1234` + memory + cron
+- `MODEL_STACK.md` — open-source model selection and migration notes
 - `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5`
 - `.env.example` — Slack + LM Studio vars (no paid keys)

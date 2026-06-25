@@ -3,7 +3,7 @@
     mode: "merge",
     providers: {
       lmstudio: {
-        baseUrl: "http://localhost:1234/v1",
+        baseUrl: "http://localhost:1235/v1",
         apiKey: "lm-studio",
         api: "openai-completions",
         contextWindow: 32768,
@@ -11,12 +11,6 @@
           {
             id: "liquid/lfm2.5-1.2b-instruct",
             name: "LFM2.5 1.2B Instruct (Q4)",
-            api: "openai-completions",
-            input: ["text"],
-          },
-          {
-            id: "liquid/lfm2.5-1.2b-thinking",
-            name: "LFM2.5 1.2B Thinking (Q4)",
             api: "openai-completions",
             input: ["text"],
           },
@@ -29,7 +23,6 @@
       model: { primary: "lmstudio/liquid/lfm2.5-1.2b-instruct" },
       models: {
         "lmstudio/liquid/lfm2.5-1.2b-instruct": {},
-        "lmstudio/liquid/lfm2.5-1.2b-thinking": {},
       },
     },
   },

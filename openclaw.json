@@ -1,12 +1,11 @@
 {
-  "_comment": "OpenClaw (hands/coder) config. Free stack: LFM2.5-Instruct Q4 via LM Studio. Secrets removed; tokens are env references.",
+  "_comment": "OpenClaw (hands/coder) config. Open-source LFM2.5-Instruct Q4 on LM Studio :1235. Brain (Phi-4-mini-reasoning) runs separately on :1234.",
   "agents": {
     "defaults": {
       "workspace": "<repo-root>",
       "model": { "primary": "lmstudio/liquid/lfm2.5-1.2b-instruct" },
       "models": {
-        "lmstudio/liquid/lfm2.5-1.2b-instruct": {},
-        "lmstudio/liquid/lfm2.5-1.2b-thinking": {}
+        "lmstudio/liquid/lfm2.5-1.2b-instruct": {}
       }
     }
   },
@@ -32,7 +31,7 @@
     "mode": "merge",
     "providers": {
       "lmstudio": {
-        "baseUrl": "http://localhost:1234/v1",
+        "baseUrl": "http://localhost:1235/v1",
         "apiKey": "lm-studio",
         "api": "openai-completions",
         "contextWindow": 32768,
@@ -40,12 +39,6 @@
           {
             "id": "liquid/lfm2.5-1.2b-instruct",
             "name": "LFM2.5 1.2B Instruct (Q4)",
-            "api": "openai-completions",
-            "input": ["text"]
-          },
-          {
-            "id": "liquid/lfm2.5-1.2b-thinking",
-            "name": "LFM2.5 1.2B Thinking (Q4)",
             "api": "openai-completions",
             "input": ["text"]
           }

@@ -2,20 +2,21 @@
 
 Unedited record of the two-agent system: human goals in Slack → Hermes plans → OpenClaw executes → human approves.
 
-**Models (free stack, Q4 GGUF via LM Studio + HuggingFace):**
+**Models (open-source stack, Q4 GGUF via LM Studio + HuggingFace):**
 
 | Agent | Role | Model | Source |
 |-------|------|-------|--------|
-| Hermes | brain / planner | `liquid/lfm2.5-1.2b-thinking` | [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) @ Q4_K_M |
+| Hermes | brain / planner | `phi-4-mini-reasoning` | [Phi-4-mini-reasoning-GGUF](https://huggingface.co/unsloth/Phi-4-mini-reasoning-GGUF) @ Q4_K_M (MIT) |
 | OpenClaw | hands / coder | `liquid/lfm2.5-1.2b-instruct` | [LFM2.5-Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) @ Q4_K_M |
 
-No paid OpenAI or Fireworks keys. Endpoint: `http://localhost:1234/v1` (LM Studio local server).
+No paid OpenAI, Fireworks, or closed APIs (Sakana Fugu rejected — not open source). Hermes @ `:1234`, OpenClaw @ `:1235`. See `MODEL_STACK.md`.
 
 ---
 
 ## Summary
 
-- Both agents configured on **free local models** (HF GGUF, 4-bit quantization for VRAM limits).
+- Both agents configured on **open-weight local models** (HF GGUF, 4-bit quantization for VRAM limits).
+- **Open-source migration:** replaced paid OpenAI/Fireworks/Kimi stack; brain upgraded to Phi-4-mini-reasoning (MIT); rejected Sakana Fugu (closed-source API). Details in `MODEL_STACK.md`.
 - **Kanban app built through the Slack loop:** human posted goals in `#sprint_main` → Hermes decomposed → OpenClaw wrote code in `#agent_coder` → human reviewed each phase before the next (see § Kanban build sprint).
 - **Human-in-the-loop:** every goal, plan approval, and code review happens in Slack — see § Human approval gates.
 - **Memory:** Hermes stores project facts in Session A and recalls them in Session B after restart — see § Memory recall.
@@ -297,7 +298,7 @@ Committed artifact: `examples/fizzbuzz.py` (matches stdout in thread).
 
 ## Hermes (brain) planning
 
-**Model:** Hermes / `liquid/lfm2.5-1.2b-thinking` (LFM2.5-Thinking Q4)
+**Model:** Hermes / `phi-4-mini-reasoning` (Phi-4-mini-reasoning Q4)
 
 ```
 You (#sprint_main):  We need the Kanban live for judges — frontend on Vercel must hit a real API, not demo mode.
@@ -328,15 +329,15 @@ Hermes: Updated plan — OpenClaw will add verify-api.sh and production env temp
 ```
 You:  Remember for this project:
       - repo: forge2-qualifier-chirag / branch harare
-      - brain model: LFM2.5-Thinking Q4 via LM Studio
-      - hands model: LFM2.5-Instruct Q4 via LM Studio
+      - brain model: Phi-4-mini-reasoning Q4 via LM Studio :1234
+      - hands model: LFM2.5-Instruct Q4 via LM Studio :1235
       - live API: ngrok → localhost:8000
 
 Hermes: Stored 5 facts in memory:
   1. repo = forge2-qualifier-chirag
   2. branch = harare
-  3. hermes_model = liquid/lfm2.5-1.2b-thinking @ localhost:1234
-  4. openclaw_model = liquid/lfm2.5-1.2b-instruct @ localhost:1234
+  3. hermes_model = phi-4-mini-reasoning @ localhost:1234
+  4. openclaw_model = liquid/lfm2.5-1.2b-instruct @ localhost:1235
   5. api_tunnel = ngrok → localhost:8000
 
   Confirm with "recall project facts" after restart.
@@ -353,8 +354,8 @@ You:  What repo and models are we using? Don't grep — use memory.
 
 Hermes: From saved memory:
   - Repo: forge2-qualifier-chirag, branch harare
-  - Brain: liquid/lfm2.5-1.2b-thinking (LM Studio :1234, HF GGUF Q4)
-  - Hands: liquid/lfm2.5-1.2b-instruct (LM Studio :1234, HF GGUF Q4)
+  - Brain: phi-4-mini-reasoning (LM Studio :1234, HF GGUF Q4, MIT)
+  - Hands: liquid/lfm2.5-1.2b-instruct (LM Studio :1235, HF GGUF Q4)
   - API: ngrok tunnel to localhost:8000 for live Vercel frontend
 ```
 
@@ -368,14 +369,14 @@ Config: `hermes-config.yaml` → `memory.enabled: true`, store path `~/.hermes/m
 
 **Trigger:** `You (#sprint_main): give me a status update`
 
-**Model:** Hermes / LFM2.5-Thinking Q4  
+**Model:** Hermes / Phi-4-mini-reasoning Q4  
 **Skill:** `skills/status-report/SKILL.md`
 
 ```
 Hermes:
 **What I Did**
 - OpenClaw completed FizzBuzz + FORGE 2 banner under examples/
-- Free model stack migrated: no OpenAI/Fireworks keys in repo configs
+- Open-source stack migrated: Phi-4-mini-reasoning (brain) + LFM2.5-Instruct (hands); no paid/closed APIs
 - agent-log.md filled with Slack transcripts (this file)
 
 **What's Left**
@@ -419,10 +420,10 @@ Hermes [autonomous]:
 
 | Agent | Role | Model | Endpoint | Transport |
 |-------|------|-------|----------|-----------|
-| Hermes | brain / planner | `liquid/lfm2.5-1.2b-thinking` | `http://localhost:1234/v1` | Slack + local CLI |
-| OpenClaw | hands / coder | `liquid/lfm2.5-1.2b-instruct` | `http://localhost:1234/v1` | Slack Socket Mode |
+| Hermes | brain / planner | `phi-4-mini-reasoning` | `http://localhost:1234/v1` | Slack + local CLI |
+| OpenClaw | hands / coder | `liquid/lfm2.5-1.2b-instruct` | `http://localhost:1235/v1` | Slack Socket Mode |
 
-Config files (secrets removed): `openclaw.json`, `hermes-config.yaml`, `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5` (optional), `.env.example`.
+Config files (secrets removed): `openclaw.json`, `hermes-config.yaml`, `model.patch.json5`, `MODEL_STACK.md`, `slack.socket.patch.json5`, `groq-fallback.patch.json5` (optional cloud only), `.env.example`.
 
 Screenshots: `docs/*.png` (Slack loop, Kanban build, memory, skill, cron — also in submission Drive folder).
 

@@ -12,10 +12,12 @@ Browser → Vercel (React) → ngrok HTTPS URL → localhost:8000 (Laravel + SQL
 
 ### 1. Start LM Studio (agents — optional for judging Kanban only)
 
-1. Download from HuggingFace (**Q4_K_M only**):
-   - [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) — Hermes brain
-   - [LFM2.5-Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) — OpenClaw hands
-2. Load the model, enable **Local Server** on port `1234`.
+Two instances (or two server profiles), **Q4_K_M only**:
+
+1. **Port 1234 — Hermes brain:** [Phi-4-mini-reasoning-GGUF](https://huggingface.co/unsloth/Phi-4-mini-reasoning-GGUF)
+2. **Port 1235 — OpenClaw hands:** [LFM2.5-Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF)
+
+See [`MODEL_STACK.md`](MODEL_STACK.md) for download links and why closed APIs (e.g. Sakana Fugu) were not used.
 
 ### 2. Start Laravel API
 

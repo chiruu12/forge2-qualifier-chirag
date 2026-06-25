@@ -1,10 +1,12 @@
-# Forge 2 Kanban — two-agent system (free stack)
+# Forge 2 Kanban — two-agent system (open-source models)
 
-A Trello-style Kanban board built with a **human-in-the-loop two-agent Slack loop**.
+A Trello-style Kanban board built with a **human-in-the-loop two-agent Slack loop**, running entirely on **open-weight models** from Hugging Face (4-bit local inference).
 
-- **Brain (Hermes):** plans, remembers, runs skills, posts on a schedule — `LFM2.5-Thinking` Q4 via LM Studio.
-- **Hands (OpenClaw):** writes and runs code, reports back — `LFM2.5-Instruct` Q4 via LM Studio.
+- **Brain (Hermes):** plans, remembers, runs skills, posts on a schedule — **Phi-4-mini-reasoning** Q4 via LM Studio (`:1234`).
+- **Hands (OpenClaw):** writes and runs code, reports back — **LFM2.5-Instruct** Q4 via LM Studio (`:1235`).
 - **You:** post goals, approve plans, review output — all in Slack.
+
+See [`MODEL_STACK.md`](MODEL_STACK.md) for why we migrated off paid/closed APIs (including Sakana Fugu) and how models were chosen.
 
 ## What it does
 
@@ -14,14 +16,14 @@ Kanban: **Boards → Lists → Cards**, with tags, members, due dates, drag-and-
 - **Frontend:** React (Vite), deployed on Vercel
 - **Live API:** Laravel tunneled via **ngrok** so the deployed frontend hits real data (see [`DEPLOYMENT.md`](DEPLOYMENT.md))
 
-## Models & routing (free stack)
+## Models & routing (open-source stack)
 
 | Role | Model | Source | Endpoint |
 |------|-------|--------|----------|
-| **Brain** (Hermes) | `liquid/lfm2.5-1.2b-thinking` | [HF GGUF Q4_K_M](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) | LM Studio `http://localhost:1234/v1` |
-| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b-instruct` | [HF GGUF Q4_K_M](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) | LM Studio `http://localhost:1234/v1` |
+| **Brain** (Hermes) | `phi-4-mini-reasoning` | [Phi-4-mini-reasoning-GGUF](https://huggingface.co/unsloth/Phi-4-mini-reasoning-GGUF) @ Q4_K_M (MIT) | LM Studio `http://localhost:1234/v1` |
+| **Hands** (OpenClaw) | `liquid/lfm2.5-1.2b-instruct` | [LFM2.5-Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) @ Q4_K_M | LM Studio `http://localhost:1235/v1` |
 
-**Why this split:** Thinking variant decomposes goals; Instruct variant executes tool calls and file edits. Both are **free**, local, and 4-bit quantized for VRAM limits. Optional Groq free-tier fallback: `groq-fallback.patch.json5`.
+**Why this split:** Phi-4-mini-reasoning handles goal decomposition and planning; LFM2.5-Instruct executes tool calls and file edits. Both are **open weights**, local, and 4-bit quantized for VRAM limits. Two LM Studio ports let brain and hands run simultaneously.
 
 ## Live URL
 
@@ -31,11 +33,12 @@ Kanban: **Boards → Lists → Cards**, with tags, members, due dates, drag-and-
 
 ## Run locally
 
-### Agents (LM Studio)
+### Agents (LM Studio — two ports)
 
-1. Download both GGUF models from HuggingFace (**Q4_K_M only**).
-2. Load **Instruct** for OpenClaw / **Thinking** for Hermes.
-3. Enable Local Server on port `1234`.
+1. Download both GGUF models from HuggingFace (**Q4_K_M only**). Details: [`MODEL_STACK.md`](MODEL_STACK.md).
+2. **Port 1234:** load **Phi-4-mini-reasoning** → Hermes brain.
+3. **Port 1235:** load **LFM2.5-Instruct** → OpenClaw hands.
+4. Enable Local Server on each instance.
 
 ### Backend
 
@@ -85,9 +88,10 @@ docs/              Evidence screenshots
 agent-log.md       Unedited agent loop log (Kanban build + HITL + memory + skill)
 BUILD_CHRONOLOGY.md Slack goals mapped to git commits and files
 ARCHITECTURE.md    System design
+MODEL_STACK.md     Open-source model choices (Phi-4 brain + LFM2.5 hands)
 DEPLOYMENT.md      ngrok + Vercel live demo
-openclaw.json      OpenClaw config (LFM2.5-Instruct)
-hermes-config.yaml Hermes config (LFM2.5-Thinking + memory + cron)
+openclaw.json      OpenClaw config (LFM2.5-Instruct @ :1235)
+hermes-config.yaml Hermes config (Phi-4-mini-reasoning @ :1234 + memory + cron)
 .env.example       Env template (no paid keys)
 ```
 
@@ -96,7 +100,7 @@ hermes-config.yaml Hermes config (LFM2.5-Thinking + memory + cron)
 Every phase of the Kanban app went through the **Slack two-agent loop**:
 
 1. You posted a goal in `#sprint_main`
-2. **Hermes** (LFM2.5-Thinking) decomposed it and waited for your approval
+2. **Hermes** (Phi-4-mini-reasoning) decomposed it and waited for your approval
 3. **OpenClaw** (LFM2.5-Instruct) wrote and ran the code in `#agent_coder`
 4. You reviewed output before the next phase
 
