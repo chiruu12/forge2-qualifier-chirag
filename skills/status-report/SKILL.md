@@ -3,13 +3,47 @@ name: status-report
 description: Post a What I Did / What's Left / What Needs Your Call update to Slack.
 ---
 
-When asked for a status update, gather three things: tasks completed, tasks
-remaining, and any decision you need from the human.
+# status-report
 
-Reply in exactly three sections, in this order:
+Hermes fires this skill whenever a human asks for a status update, at the end of a planning cycle, or during the autonomous cron heartbeat.
 
-**What I Did** - what was completed since the last update.
-**What's Left** - what still needs to happen.
-**What Needs Your Call** - any decision or approval you need from the human.
+## Trigger phrases
 
-Keep each section to short bullet points. Post it to the current channel.
+- "status update"
+- "what's the status"
+- "give me a status report"
+- cron prompt in `hermes-config.yaml` (autonomous run)
+
+## Procedure
+
+1. Gather: tasks completed since last update, tasks remaining, decisions blocked on the human.
+2. Reply in **exactly three sections**, in this order — no extra preamble:
+   - **What I Did**
+   - **What's Left**
+   - **What Needs Your Call**
+3. Keep each section to short bullet points (2–5 bullets).
+4. Post to the current Slack channel (`#sprint_main` for human-facing, `#agent_log` for cron).
+
+## Example output (verified in agent-log.md)
+
+**What I Did**
+- OpenClaw wrote and ran `examples/fizzbuzz.py` in `#agent_coder` (LFM2.5-Instruct Q4).
+- Laravel API seeded and reachable at `/api/boards`.
+- Frontend wired to ngrok tunnel for live demo.
+
+**What's Left**
+- Redeploy Vercel with updated `VITE_API_URL` after ngrok restart.
+- Capture final screenshot set for submission.
+
+**What Needs Your Call**
+- Approve moving "Wire frontend to API" card to Done after you verify the live URL.
+
+## Human-in-the-loop gate
+
+If **What Needs Your Call** is non-empty, Hermes **must not** proceed on that decision until the human replies in `#sprint_main`. This is the explicit approval checkpoint.
+
+## Config reference
+
+- Skill path: `skills/status-report/SKILL.md`
+- Hermes loads skills from `./skills` (see `hermes-config.yaml`)
+- Cron uses the same three-section format for autonomous posts to `#agent_log`
