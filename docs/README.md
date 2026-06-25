@@ -15,5 +15,5 @@ Commit these five PNGs here (also mirrored in the submission Drive folder):
 Referenced from [`agent-log.md`](../agent-log.md). Full verbatim transcripts are in that file even without screenshots.
 
 **Capture tips:**
-- Include model name (`phi-4-mini-reasoning` / `lfm2.5-1.2b-instruct`) in terminal or LM Studio UI.
+- Include model name (`lfm2.5-1.2b-thinking` / `lfm2-1.2b-tool`) in terminal or LM Studio UI.
 - For cron, show timestamp with no `@mention` or human prompt above the post.

@@ -1,13 +1,13 @@
 # Hermes (brain/orchestrator) config — excerpt of ~/.hermes/config.yaml
-# Open-source stack: Phi-4-mini-reasoning Q4 via LM Studio (MIT, HuggingFace GGUF).
+# Open-source stack: LFM2.5-Thinking Q4 via LM Studio (HuggingFace GGUF).
 #
 # Download (4-bit only, VRAM-friendly):
-#   unsloth/Phi-4-mini-reasoning-GGUF @ Q4_K_M (~2.5 GB)
+#   LiquidAI/LFM2.5-1.2B-Thinking-GGUF @ Q4_K_M
 # Load in LM Studio → Local Server on port 1234.
-# See MODEL_STACK.md for why Fugu / paid APIs were rejected.
+# See MODEL_STACK.md
 
 model:
-  default: phi-4-mini-reasoning
+  default: liquid/lfm2.5-1.2b-thinking
   provider: custom
   base_url: http://localhost:1234/v1
   max_tokens: 4096

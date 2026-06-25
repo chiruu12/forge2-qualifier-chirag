@@ -4,8 +4,8 @@
 
 ```mermaid
 flowchart LR
-    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>Phi-4-mini-reasoning Q4"]
-    B -->|plan + task| C["OpenClaw - Hands<br/>LFM2.5-Instruct Q4"]
+    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>LFM2.5-Thinking Q4"]
+    B -->|plan + task| C["OpenClaw - Hands<br/>LFM2-Tool Q4"]
     C -->|writes & runs code| Repo[("Repo: backend + frontend")]
     C -->|What I Did / What's Left / What Needs Your Call| H
     B -. "memory + skill + cron" .-> Log["#agent_log"]
@@ -28,14 +28,14 @@ flowchart LR
 
 | Agent | Model | HF source | Endpoint |
 |-------|-------|-----------|----------|
-| Hermes (planning) | `phi-4-mini-reasoning` | [Phi-4-mini-reasoning-GGUF](https://huggingface.co/unsloth/Phi-4-mini-reasoning-GGUF) @ Q4_K_M (MIT) | LM Studio `:1234/v1` |
-| OpenClaw (coding) | `liquid/lfm2.5-1.2b-instruct` | [Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) @ Q4_K_M | LM Studio `:1235/v1` |
+| Hermes (planning) | `liquid/lfm2.5-1.2b-thinking` | [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) @ Q4_K_M | LM Studio `:1234/v1` |
+| OpenClaw (coding) | `liquid/lfm2-1.2b-tool` | [LFM2-Tool-GGUF](https://huggingface.co/LiquidAI/LFM2-1.2B-Tool-GGUF) @ Q4_K_M | LM Studio `:1235/v1` |
 
 **Why this split:**
 
-- **Planning is reasoning-heavy** — Phi-4-mini-reasoning (3.8B, MIT) is the strongest small open reasoning model we evaluated; Sakana Fugu was rejected as closed-source.
-- **Execution is tool-heavy** — LFM2.5-Instruct (1.2B) is fast and VRAM-light for file edits and command runs.
-- **Both are open weights** — HuggingFace GGUF, local inference, 4-bit only (VRAM constraint).
+- **Planning is reasoning-heavy** — LFM2.5-Thinking decomposes goals and sequences work.
+- **Execution is tool-heavy** — LFM2-Tool is purpose-built for concise tool/API/shell calls.
+- **Unified Liquid stack** — same vendor, same VRAM footprint (~731 MB each at Q4).
 - **Dual ports** — brain and hands run at the same time without swapping models.
 
 Full rationale and rejected alternatives: [`MODEL_STACK.md`](MODEL_STACK.md).
@@ -62,8 +62,8 @@ See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser dem
 
 ## Config files (secrets removed)
 
-- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b-instruct` @ `:1235`
-- `hermes-config.yaml` — Hermes; `phi-4-mini-reasoning` @ `:1234` + memory + cron
+- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2-1.2b-tool` @ `:1235`
+- `hermes-config.yaml` — Hermes; `liquid/lfm2.5-1.2b-thinking` @ `:1234` + memory + cron
 - `MODEL_STACK.md` — open-source model selection and migration notes
 - `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5`
 - `.env.example` — Slack + LM Studio vars (no paid keys)

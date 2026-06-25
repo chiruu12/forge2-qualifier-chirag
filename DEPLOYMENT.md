@@ -14,8 +14,9 @@ Browser → Vercel (React) → ngrok HTTPS URL → localhost:8000 (Laravel + SQL
 
 Two instances (or two server profiles), **Q4_K_M only**:
 
-1. **Port 1234 — Hermes brain:** [Phi-4-mini-reasoning-GGUF](https://huggingface.co/unsloth/Phi-4-mini-reasoning-GGUF)
-2. **Port 1235 — OpenClaw hands:** [LFM2.5-Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF)
+1. **Port 1234 — Hermes brain:** [LFM2.5-Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF)
+2. **Port 1235 — OpenClaw hands:** [LFM2-Tool-GGUF](https://huggingface.co/LiquidAI/LFM2-1.2B-Tool-GGUF)
+3. Verify: `./scripts/verify-models.sh`
 
 See [`MODEL_STACK.md`](MODEL_STACK.md) for download links and why closed APIs (e.g. Sakana Fugu) were not used.
 

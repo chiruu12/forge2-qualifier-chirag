@@ -9,8 +9,8 @@
         contextWindow: 32768,
         models: [
           {
-            id: "liquid/lfm2.5-1.2b-instruct",
-            name: "LFM2.5 1.2B Instruct (Q4)",
+            id: "liquid/lfm2-1.2b-tool",
+            name: "LFM2 1.2B Tool (Q4)",
             api: "openai-completions",
             input: ["text"],
           },
@@ -20,9 +20,9 @@
   },
   agents: {
     defaults: {
-      model: { primary: "lmstudio/liquid/lfm2.5-1.2b-instruct" },
+      model: { primary: "lmstudio/liquid/lfm2-1.2b-tool" },
       models: {
-        "lmstudio/liquid/lfm2.5-1.2b-instruct": {},
+        "lmstudio/liquid/lfm2-1.2b-tool": {},
       },
     },
   },

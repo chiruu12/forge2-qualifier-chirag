@@ -1,11 +1,11 @@
 {
-  "_comment": "OpenClaw (hands/coder) config. Open-source LFM2.5-Instruct Q4 on LM Studio :1235. Brain (Phi-4-mini-reasoning) runs separately on :1234.",
+  "_comment": "OpenClaw (hands/coder) config. LFM2-Tool Q4 on LM Studio :1235. Brain (LFM2.5-Thinking) runs on :1234.",
   "agents": {
     "defaults": {
       "workspace": "<repo-root>",
-      "model": { "primary": "lmstudio/liquid/lfm2.5-1.2b-instruct" },
+      "model": { "primary": "lmstudio/liquid/lfm2-1.2b-tool" },
       "models": {
-        "lmstudio/liquid/lfm2.5-1.2b-instruct": {}
+        "lmstudio/liquid/lfm2-1.2b-tool": {}
       }
     }
   },
@@ -37,8 +37,8 @@
         "contextWindow": 32768,
         "models": [
           {
-            "id": "liquid/lfm2.5-1.2b-instruct",
-            "name": "LFM2.5 1.2B Instruct (Q4)",
+            "id": "liquid/lfm2-1.2b-tool",
+            "name": "LFM2 1.2B Tool (Q4)",
             "api": "openai-completions",
             "input": ["text"]
           }

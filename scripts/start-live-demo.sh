@@ -8,6 +8,13 @@ BACKEND="$ROOT/backend"
 echo "==> Forge 2 live demo — Laravel + ngrok"
 echo ""
 
+if lsof -i :8000 -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "WARNING: port 8000 is already in use."
+  echo "         Stop the other process first, or run: php artisan serve --host=0.0.0.0 --port=8001"
+  echo "         (then: ngrok http 8001)"
+  echo ""
+fi
+
 # Backend setup
 cd "$BACKEND"
 if [ ! -f .env ]; then

@@ -27,7 +27,7 @@ Hermes fires this skill whenever a human asks for a status update, at the end of
 ## Example output (verified in agent-log.md)
 
 **What I Did**
-- OpenClaw wrote and ran `examples/fizzbuzz.py` in `#agent_coder` (LFM2.5-Instruct Q4).
+- OpenClaw wrote and ran `examples/fizzbuzz.py` in `#agent_coder` (LFM2-Tool Q4).
 - Laravel API seeded and reachable at `/api/boards`.
 - Frontend wired to ngrok tunnel for live demo.
 
