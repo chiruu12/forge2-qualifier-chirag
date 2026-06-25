@@ -38,7 +38,13 @@ Verify: `./scripts/verify-api.sh http://localhost:7900/api`
 ngrok http 7900
 ```
 
-Set Vercel: `VITE_API_URL=https://YOUR-SUBDOMAIN.ngrok-free.app/api`
+Set Vercel: `VITE_API_URL=https://YOUR-SUBDOMAIN.ngrok-free.dev/api`
+
+Or run the helper (reads ngrok from localhost:4040, sets env, redeploys):
+
+```bash
+./scripts/deploy-vercel-live.sh
+```
 
 ### 4. Full validation
 

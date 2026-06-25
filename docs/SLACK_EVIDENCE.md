@@ -2,6 +2,24 @@
 
 Prerequisites: LM Studio **1234**, Laravel **7900**, `./scripts/verify-all.sh` passes.
 
+## OpenClaw local-model setup (required)
+
+| Setting | Value |
+|---------|-------|
+| LM Studio context | **32768** on `liquid/lfm2.5-1.2b` |
+| OpenClaw tools | `minimal` + `alsoAllow: [group:fs, group:runtime]` |
+| Lean mode | `localModelLean: true` |
+| Slack overflow | type `/new` in channel, then retry |
+
+Without exec tools, FizzBuzz returns a sample script instead of running Python. Without enough context, you get `LLM request failed` or `Context overflow`.
+
+Start agents:
+```bash
+./scripts/start-live-demo.sh    # Laravel :7900
+./scripts/start-openclaw.sh     # OpenClaw gateway + Slack
+hermes slack                    # Hermes brain
+```
+
 ## Channels
 
 | Channel | Agent | Purpose |
@@ -20,11 +38,11 @@ Models: **lfm2.5-1.2b-thinking-mlx** (brain) · **liquid/lfm2.5-1.2b** (hands)
 ```
 Write a Python FizzBuzz script for 1–20, run it, and paste stdout. Use code-handoff format.
 ```
-Screenshot: three-section reply + model name visible.
+Screenshot: three-section reply + stdout + model name visible.
 
 ---
 
-## 2. Kanban backend → `docs/kanban-backend.png` ❌ needed
+## 2. Kanban backend → `docs/kanban-backend.png` ⚠️ copy from Drive → commit
 
 **#sprint_main** — post:
 ```
@@ -34,7 +52,7 @@ Reply `yes`. Screenshot **#agent_coder** backend handoff.
 
 ---
 
-## 3. Kanban frontend → `docs/kanban-frontend.png` ❌ needed
+## 3. Kanban frontend → `docs/kanban-frontend.png` ⚠️ copy from Drive → commit
 
 **#sprint_main** — post:
 ```
@@ -86,10 +104,13 @@ Screenshot: What I Did / What's Left / What Needs Your Call.
 
 ---
 
-## Push
+## Final push (repo + Drive aligned)
 
 ```bash
-git add docs/*.png docs/SLACK_EVIDENCE.md skills/
-git commit -m "Add Slack evidence guide and agent skills."
-git push -u origin kanban-score-improvement-plan
+# Copy any remaining PNGs from Drive into docs/
+git add docs/*.png openclaw.json model.patch.json5 docs/ scripts/start-openclaw.sh
+git commit -m "Align open-source MLX stack config and evidence screenshots."
+git push
 ```
+
+Updates [PR #1](https://github.com/chiruu12/forge2-qualifier-chirag/pull/1).

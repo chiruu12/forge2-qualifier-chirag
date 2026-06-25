@@ -82,8 +82,8 @@ Raw Slack transcripts and screenshots: [`agent-log.md`](agent-log.md), [`docs/`]
 ```
 backend/           Laravel API + SQLite
 frontend/          React UI (Vercel)
-skills/            Hermes skills (status-report)
-scripts/           verify-models.sh, verify-all.sh, verify-api.sh, start-live-demo.sh
+skills/            Hermes skills (status-report, kanban-plan, code-handoff)
+scripts/           verify-*.sh, start-live-demo.sh, start-openclaw.sh, deploy-vercel-live.sh
 docs/              Evidence screenshots
 agent-log.md       Unedited agent loop log (Kanban build + HITL + memory + skill)
 BUILD_CHRONOLOGY.md Slack goals mapped to git commits and files

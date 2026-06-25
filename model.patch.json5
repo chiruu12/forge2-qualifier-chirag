@@ -6,13 +6,16 @@
         baseUrl: "http://127.0.0.1:1234/v1",
         apiKey: "lm-studio",
         api: "openai-completions",
-        contextWindow: 32768,
+        contextWindow: 16384,
+        contextTokens: 16384,
         models: [
           {
             id: "liquid/lfm2.5-1.2b",
             name: "LFM2.5 1.2B Instruct (MLX 8-bit)",
             api: "openai-completions",
             input: ["text"],
+            contextWindow: 16384,
+            contextTokens: 16384,
           },
           {
             id: "lfm2.5-1.2b-thinking-mlx",
@@ -27,10 +30,22 @@
   agents: {
     defaults: {
       model: { primary: "lmstudio/liquid/lfm2.5-1.2b" },
+      contextTokens: 16384,
+      thinkingDefault: "off",
+      experimental: { localModelLean: true },
+      startupContext: { enabled: false },
+      compaction: {
+        reserveTokens: 2048,
+        reserveTokensFloor: 0,
+      },
       models: {
         "lmstudio/liquid/lfm2.5-1.2b": {},
         "lmstudio/lfm2.5-1.2b-thinking-mlx": {},
       },
     },
+  },
+  tools: {
+    profile: "minimal",
+    alsoAllow: ["group:fs", "group:runtime"],
   },
 }

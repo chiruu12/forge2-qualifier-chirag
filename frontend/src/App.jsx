@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:7900/api'
 const API_LABEL = API.replace(/^https?:\/\//, '').replace(/\/api$/, '')
+const IS_NGROK = /ngrok/i.test(API)
+const apiHeaders = (extra = {}) => ({
+  ...(IS_NGROK ? { 'ngrok-skip-browser-warning': 'true' } : {}),
+  ...extra,
+})
+const apiFetch = (url, opts = {}) =>
+  fetch(url, { ...opts, headers: apiHeaders(opts.headers || {}) })
 
 const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
 function dueInfo(due) {
@@ -56,7 +63,7 @@ export default function App() {
 
   const load = async () => {
     try {
-      const res = await fetch(`${API}/boards`)
+      const res = await apiFetch(`${API}/boards`)
       if (!res.ok) throw new Error('http ' + res.status)
       const boards = await res.json()
       setBoard(boards[0] || demoBoard()); setDemo(false); setApiOk(true)
@@ -64,9 +71,9 @@ export default function App() {
   }
   useEffect(() => { load() }, [])
 
-  const POST = (u, b) => fetch(`${API}${u}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
-  const PATCH = (u, b) => fetch(`${API}${u}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
-  const DEL = (u) => fetch(`${API}${u}`, { method: 'DELETE' })
+  const POST = (u, b) => apiFetch(`${API}${u}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+  const PATCH = (u, b) => apiFetch(`${API}${u}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+  const DEL = (u) => apiFetch(`${API}${u}`, { method: 'DELETE' })
   const apply = async (localFn, apiCall) => {
     if (demo) { setBoard(b => { const nb = structuredClone(b); localFn(nb); return nb }); return }
     try { await apiCall(); await load() }

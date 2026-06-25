@@ -328,14 +328,14 @@ Hermes: Updated plan — OpenClaw will add verify-api.sh and production env temp
 
 ```
 You:  Remember for this project:
-      - repo: forge2-qualifier-chirag / branch harare
+      - repo: forge2-qualifier-chirag / branch kanban-score-improvement-plan
       - brain model: lfm2.5-1.2b-thinking-mlx (4-bit MLX) @ LM Studio :1234
       - hands model: liquid/lfm2.5-1.2b (8-bit MLX) @ LM Studio :1234
       - live API: ngrok → localhost:7900
 
 Hermes: Stored 5 facts in memory:
   1. repo = forge2-qualifier-chirag
-  2. branch = harare
+  2. branch = kanban-score-improvement-plan
   3. hermes_model = lfm2.5-1.2b-thinking-mlx @ localhost:1234
   4. openclaw_model = liquid/lfm2.5-1.2b @ localhost:1234
   5. api_tunnel = ngrok → localhost:7900
@@ -353,7 +353,7 @@ Hermes: Stored 5 facts in memory:
 You:  What repo and models are we using? Don't grep — use memory.
 
 Hermes: From saved memory:
-  - Repo: forge2-qualifier-chirag, branch harare
+  - Repo: forge2-qualifier-chirag, branch kanban-score-improvement-plan
   - Brain: lfm2.5-1.2b-thinking-mlx (LM Studio :1234, MLX 4-bit)
   - Hands: liquid/lfm2.5-1.2b (LM Studio :1234, MLX 8-bit)
   - API: ngrok tunnel to localhost:7900 for live Vercel frontend
@@ -425,7 +425,9 @@ Hermes [autonomous]:
 
 Config files (secrets removed): `openclaw.json`, `hermes-config.yaml`, `model.patch.json5`, `MODEL_STACK.md`, `slack.socket.patch.json5`, `groq-fallback.patch.json5` (optional cloud only), `.env.example`.
 
-Screenshots: `docs/*.png` (Slack loop, Kanban build, memory, skill, cron — also in submission Drive folder).
+**OpenClaw local-model tuning:** `tools.profile: minimal` + `group:fs` + `group:runtime` for exec without context overflow; LM Studio context **32768** on `liquid/lfm2.5-1.2b`. See `MODEL_STACK.md` and `scripts/start-openclaw.sh`.
+
+Screenshots: `docs/*.png` (Slack loop, Kanban build, memory, skill, cron — also in submission Google Drive folder).
 
 ### Quick verification (judges)
 
