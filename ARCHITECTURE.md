@@ -4,51 +4,62 @@
 
 ```mermaid
 flowchart LR
-    H["You<br/>#sprint_main"] -->|goal| B["Hermes - Brain<br/>Kimi 2.6 (Fireworks)"]
-    B -->|plan + task| C["OpenClaw - Hands<br/>gpt-5.4-nano (OpenAI)"]
+    H["You<br/>#sprint_main"] -->|goal + approval| B["Hermes - Brain<br/>LFM2.5-Thinking Q4"]
+    B -->|plan + task| C["OpenClaw - Hands<br/>LFM2.5-Instruct Q4"]
     C -->|writes & runs code| Repo[("Repo: backend + frontend")]
     C -->|What I Did / What's Left / What Needs Your Call| H
     B -. "memory + skill + cron" .-> Log["#agent_log"]
+    H -. "Gate 3: approve blocked decisions" .-> B
 ```
 
-- **Hermes (brain):** receives the goal, decomposes it into steps, posts the plan *before* acting, hands coding tasks to OpenClaw, keeps cross-session memory, runs the `status-report` skill, and fires a scheduled update with no human prompt.
-- **OpenClaw (hands):** takes a task, writes and runs the code in the repo, and reports back in the standard three-section format.
-- **You:** post goals, review, approve or correct - all in Slack, nothing off-channel.
+- **Hermes (brain):** decomposes goals, posts plans *before* acting, hands coding tasks to OpenClaw, stores cross-session memory, runs `status-report` skill, fires cron with no human prompt.
+- **OpenClaw (hands):** takes approved tasks, writes/runs code, reports in three-section format.
+- **You:** post goals, say yes/no to plans, review code output, answer **What Needs Your Call** — all in Slack.
 
 ## Slack channel scheme
 
 | Channel | Purpose |
 |---------|---------|
-| `#sprint_main` | You talk to Hermes. Plans, decisions, status updates land here. |
-| `#agent_coder` | Coding tasks for OpenClaw; it works and reports here. |
-| `#agent_log` | Raw agent activity + autonomous-run output. Audit trail. |
+| `#sprint_main` | Human ↔ Hermes. Goals, plan approval, status updates. |
+| `#agent_coder` | Coding tasks for OpenClaw; code + stdout posted here. |
+| `#agent_log` | Cron heartbeat + audit trail. |
 
-## Model routing & rationale
+## Model routing (free stack)
 
-| Agent | Model | Endpoint |
-|-------|-------|----------|
-| Hermes (planning) | Kimi 2.6 - `accounts/fireworks/models/kimi-k2p6` | `https://api.fireworks.ai/inference/v1` |
-| OpenClaw (coding) | OpenAI `gpt-5.4-nano` | `https://api.openai.com/v1` |
+| Agent | Model | HF source | Endpoint |
+|-------|-------|-----------|----------|
+| Hermes (planning) | `liquid/lfm2.5-1.2b-thinking` | [Thinking-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF) @ Q4_K_M | LM Studio `:1234/v1` |
+| OpenClaw (coding) | `liquid/lfm2.5-1.2b-instruct` | [Instruct-GGUF](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF) @ Q4_K_M | LM Studio `:1234/v1` |
 
 **Why this split:**
 
-- **Planning is high-value and bursty** - it benefits from a strong reasoning model. Kimi 2.6 decomposes the goal and sequences the work.
-- **Execution is token-heavy and repetitive** - a cheap, fast model is the right tool. `gpt-5.4-nano` does the actual file edits and command runs as OpenClaw's engine.
-- This matches the brief's recommended routing: **stronger model plans, cheaper model executes.**
+- **Planning is reasoning-heavy** — LFM2.5-Thinking decomposes goals and sequences work.
+- **Execution is tool-heavy** — LFM2.5-Instruct handles file edits and command runs.
+- **Both are free** — HuggingFace GGUF, local inference, 4-bit only (VRAM constraint).
+- **No paid APIs** — replaces prior OpenAI + Fireworks stack that scored 0 on free-stack.
 
-**On the free stack:** the setup was first wired fully free (Groq `gpt-oss-120b` for the brain, a local LFM/Ollama model for the hands). Both ran, but the end-to-end agent loop was unreliable on the free tiers. We moved to a small paid pair (gpt-5.4-nano + Kimi 2.6) to get a dependable loop - a deliberate trade of the free-stack bonus for a working build, per the brief's "a clean working setup beats an ambitious broken one."
+**Optional fallback:** Groq `openai/gpt-oss-120b` free tier via `groq-fallback.patch.json5` if local VRAM is insufficient.
 
-**Fallback ladder (on rate-limit / failure):** the local model (LM Studio `lfm2.5`) and Groq remain configured as fallbacks.
+## Live deployment
+
+```
+Vercel (React)  →  ngrok HTTPS  →  localhost:8000 (Laravel + SQLite)
+```
+
+See [`DEPLOYMENT.md`](DEPLOYMENT.md). Frontend must not fall back to browser demo mode during judging.
 
 ## Memory, skill, autonomous run
 
-- **Memory:** Hermes stores project facts (repo name, default branch, model routing) and recalls them in a later session without re-pasting.
-- **Skill:** [`skills/status-report/SKILL.md`](skills/status-report/SKILL.md) makes every status update return in the same three sections.
-- **Autonomous run:** a Hermes cron posts a one-line progress update to `#agent_log` on a schedule with no human prompt.
+| Feature | Config | Evidence |
+|---------|--------|----------|
+| **Memory** | `hermes-config.yaml` → `memory.enabled: true` | `agent-log.md` § Memory recall (Session A → B) |
+| **Skill** | `skills/status-report/SKILL.md` | `agent-log.md` § Skill firing |
+| **Cron** | `hermes-config.yaml` → `cron.forge2-heartbeat` | `agent-log.md` § Autonomous run |
+| **Human-in-the-loop** | Plan approval + **What Needs Your Call** gate | `agent-log.md` § Human approval gates |
 
-## Config files (in this repo, secrets removed)
+## Config files (secrets removed)
 
-- `openclaw.json` - OpenClaw config; gateway token redacted, Slack + OpenAI keys are env references.
-- `hermes-config.yaml` - Hermes model routing; the Fireworks `api_key` is removed.
-- `slack.socket.patch.json5`, `model.patch.json5`, `openai.patch.json5` - the exact patches applied to OpenClaw.
-- `.env.example` - every env var the setup needs (fill with your own keys; never commit the real `.env`).
+- `openclaw.json` — OpenClaw; primary `lmstudio/liquid/lfm2.5-1.2b-instruct`
+- `hermes-config.yaml` — Hermes; `liquid/lfm2.5-1.2b-thinking` + memory + cron
+- `model.patch.json5`, `slack.socket.patch.json5`, `groq-fallback.patch.json5`
+- `.env.example` — Slack + LM Studio vars (no paid keys)
